@@ -23,4 +23,19 @@
 
    #+results:
 
+** Database container
+   We start from the default postgres container
+   #+BEGIN_SRC sh :tangle db_container/Dockerfile
+     FROM postgres:9.3
+   #+END_SRC
+
+   First we update our machine and install the required php packages
+   #+BEGIN_SRC sh :tangle db_container/Dockerfile
+     RUN apt-get update
+     RUN apt-get --assume-yes install \
+         php5-cli \
+         php-pear \
+         php5-pgsql \
+         php5-curl
+   #+END_SRC
 
