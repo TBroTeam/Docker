@@ -36,6 +36,13 @@
          php5-cli \
          php-pear \
          php5-pgsql \
-         php5-curl
+         php5-curl \
+         php5-dev \
+         build-essential
    #+END_SRC
 
+   Next we need to install phing
+   #+BEGIN_SRC sh :tangle db_container/Dockerfile
+     RUN pear channel-discover pear.phing.info
+     RUN pear install --alldeps phing/phing
+   #+END_SRC
