@@ -1,0 +1,13 @@
+* Installation for TBro using Docker containers
+
+** General structure
+   The Docker installation is separated into two independent containers:
+   1) Database container
+      - postgresql
+      - CHADO database scheme plus modifications
+      - AdminTools
+   2) TBro Website
+      - Apache2
+      - php settings...
+   3) memcached container
+      Maybe better included into TBro website container
