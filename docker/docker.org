@@ -46,3 +46,8 @@
      RUN pear channel-discover pear.phing.info
      RUN pear install --alldeps phing/phing
    #+END_SRC
+
+   Modify php.ini to diable phar.readonly
+   #+BEGIN_SRC sh :tangle db_container/Dockerfile
+     RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini
+   #+END_SRC
