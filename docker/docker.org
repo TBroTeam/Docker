@@ -12,3 +12,15 @@
    3) memcached container
       Maybe better included into TBro website container
    4) Worker container
+
+** Preparation
+   #+BEGIN_SRC sh 
+     mkdir db_container
+     mkdir apache_container
+     mkdir memcached_container
+     mkdir worker_container
+   #+END_SRC
+
+   #+results:
+
+
