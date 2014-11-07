@@ -11,3 +11,4 @@
       - php settings...
    3) memcached container
       Maybe better included into TBro website container
+   4) Worker container
