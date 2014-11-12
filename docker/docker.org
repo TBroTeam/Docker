@@ -274,6 +274,16 @@
      RUN a2enmod rewrite
    #+END_SRC
 
+   Generate a TBro image from the commit  82c52be7f
+   #+BEGIN_SRC sh :dir ../
+     git archive --format tar.gz --output docker/82c52be7f_Tbro.tar.gz 82c52be7f
+   #+END_SRC
+
+   And copy the TBro archive to the image
+   #+BEGIN_SRC sh :tangle apache_container/Dockerfile
+     ADD 82c52be7f_Tbro.tar.gz /home/
+   #+END_SRC
+
 ** Installation of Chado database
    #+BEGIN_SRC sh
      export CHADO_DB_NAME="chado"
