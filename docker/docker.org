@@ -164,26 +164,26 @@
          libclass-data-inheritable-perl \
          xsltproc \
          postgresql-server-dev-all
-     RUN PERL_MM_USE_DEFAULT=1 cpan -i \
-         SQL::Translator \
-         URI::Escape \
-         Pod::Usage \
-         Config::General \
-         Digest::MD5 \
-         Class::DBI::View \
-         LWP \
-         XML::Parser::PerlSAX \
-         File::Path \
-         Text::Tabs \
-         File::Spec \
-         GO::Parser \
-         LWP::Simple \
-         Tie::UrlEncoder \
-         HTML::TreeBuilder \
-         Time::HiRes \
-         IO::Dir \
-         Text::Wrap \
-         DBD::Pg
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install SQL::Translator'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install URI::Escape'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Pod::Usage'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Config::General'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Digest::MD5'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Class::DBI::View'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install LWP'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install XML::Parser::PerlSAX'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install File::Path'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Text::Tabs'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install File::Spec'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install GO::Parser'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install LWP::Simple'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Tie::UrlEncoder'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install HTML::TreeBuilder'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Time::HiRes'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install IO::Dir'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Text::Wrap'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install DBD::Pg'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install GO::Utils'
    #+END_SRC
 
    #+BEGIN_SRC sh :tangle ./db_container/fix-acl.sh :shebang "#!/bin/bash"
