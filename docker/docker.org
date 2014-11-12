@@ -21,44 +21,6 @@
      mkdir chado_create_container
      mkdir generic_db_container
    #+END_SRC
-
-   According to the thesis of Lenz, it is required to install Chado
-   1.2 separately. Therefore I need to download the Chado file first.
-   #+BEGIN_SRC sh :dir chado_create_container/
-     wget -O chado-1.2.tar.gz 'http://downloads.sourceforge.net/project/gmod/gmod/chado-1.2/chado-1.2.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fgmod%2Ffiles%2Fgmod%2Fchado-1.2%2F&ts=1415403627&use_mirror=kent'
-   #+END_SRC
-
-   Following the installation instructions from Lenz thesis, the next
-   step is the reduction of the database scheme:
-   #+BEGIN_SRC sh :dir chado_create_container/
-     # untar the chado archive
-     tar xzf chado-1.2.tar.gz
-
-     # change to newly created folder
-     cd chado-1.2
-
-     # follow the instructions of Lenz:
-     cd modules
-     perl bin/makedep.pl --modules general,cv,pub,organism,sequence,contact,companalysis,mage > default_schema.sql
-     cd ../..
-
-     # create a new archive used for later transfer to image
-     tar czf chado-1.2.mod.tar.gz chado-1.2
-   #+END_SRC
-
-   Additionally, I have to download the obo file for GO terms and convert it into XML
-   #+BEGIN_SRC sh :dir chado_create_container/
-     wget -O gene_ontology.1_2.obo 'http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo'
-
-     # convertion into xml format this might need the installation of
-     # additional packages and should be moved into the chade database
-     # generation later
-     go2fmt.pl -p obo_text -w xml gene_ontology.1_2.obo | go-apply-xslt oboxml_to_chadoxml - > g_o.1_2.chadoxml
-
-     # generation of an tar archive for transfer into the container
-     tar czf g_o.1_2.chadoxml.tar.gz  g_o.1_2.chadoxml
-   #+END_SRC
-
 ** Generic database image
    We start from the default postgres container
    #+BEGIN_SRC sh :tangle generic_db_container/Dockerfile
@@ -221,6 +183,29 @@
      export CHADO_DB_PASSWORD=${CHADO_ENV_DB_PW:-tbro}
      export CHADO_DB_HOST=${CHADO_PORT_5432_TCP_ADDR:-localhost}
      export CHADO_DB_PORT=${CHADO_PORT_5432_TCP_PORT:-5432}
+
+     # download chado package
+     wget -O /tmp/chado-1.2.tar.gz 'http://downloads.sourceforge.net/project/gmod/gmod/chado-1.2/chado-1.2.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fgmod%2Ffiles%2Fgmod%2Fchado-1.2%2F&ts=1415403627&use_mirror=kent'
+
+     # Follow the instructions of Lenz to generate an adapted version of chado
+     # untar the chado archive
+     tar xzf chado-1.2.tar.gz
+
+     # change to newly created folder
+     cd chado-1.2
+
+     # follow the instructions of Lenz:
+     cd modules
+     perl bin/makedep.pl --modules general,cv,pub,organism,sequence,contact,companalysis,mage > default_schema.sql
+     cd ..
+
+     wget -O gene_ontology.1_2.obo 'http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo'
+
+     # convertion into xml format this might need the installation of
+     # additional packages and should be moved into the chade database
+     # generation later
+     go2fmt.pl -p obo_text -w xml gene_ontology.1_2.obo | go-apply-xslt oboxml_to_chadoxml - > g_o.1_2.chadoxml
+
 
      mkdir -p /usr/local/gmod
      export GMOD_ROOT=/usr/local/gmod
