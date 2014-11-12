@@ -239,6 +239,19 @@
      FROM ubuntu
    #+END_SRC
 
+   First we update our machine and install the required php packages
+   #+BEGIN_SRC sh :tangle apache_container/Dockerfile
+     RUN apt-get update
+     RUN apt-get --assume-yes install \
+         apache2 \
+         php5 \
+         php-pear \
+         php5-pgsql \
+         php5-curl \
+         php5-dev \
+         build-essential
+   #+END_SRC
+
 ** Installation of Chado database
    #+BEGIN_SRC sh
      export CHADO_DB_NAME="chado"
