@@ -45,6 +45,11 @@
      tar czf chado-1.2.mod.tar.gz chado-1.2
    #+END_SRC
 
+   Additionally, I have to download the obo file for GO terms and convert it into XML
+   #+BEGIN_SRC sh :dir db_container/
+     wget -O gene_ontology.1_2.obo 'http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo'
+     # TODO
+   #+END_SRC
 
 ** Database container
    We start from the default postgres container
