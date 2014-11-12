@@ -226,3 +226,9 @@
      ADD fix-acl.sh /docker-entrypoint-initdb.d/
      ADD create_user_db.sh /docker-entrypoint-initdb.d/
    #+END_SRC
+
+   Now we can build and run the image
+   #+BEGIN_SRC sh :dir db_container
+     docker build --tag chado_db .
+     docker run -d --name chado_db_container chado_db
+   #+END_SRC
