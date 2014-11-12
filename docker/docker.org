@@ -264,6 +264,11 @@
      RUN pear install channel://pear.php.net/Console_ProgressBar-0.5.2beta
    #+END_SRC
 
+   We have to enable mod_rewrite
+   #+BEGIN_SRC sh :tangle apache_container/Dockerfile
+     RUN a2enmod rewrite
+   #+END_SRC
+
 ** Installation of Chado database
    #+BEGIN_SRC sh
      export CHADO_DB_NAME="chado"
