@@ -200,6 +200,7 @@
      # Follow the instructions of Lenz to generate an adapted version of chado
      # untar the chado archive
      date +"[%Y-%m-%d %H:%M:%S] Starting preparation of chado package..."
+     cd /tmp/
      tar xzf chado-1.2.tar.gz
 
      # change to newly created folder
