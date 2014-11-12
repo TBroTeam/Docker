@@ -25,13 +25,13 @@
 
    According to the thesis of Lenz, it is required to install Chado
    1.2 separately. Therefore I need to download the Chado file first.
-   #+BEGIN_SRC sh :dir apache_container/
+   #+BEGIN_SRC sh :dir chado_create_container/
      wget -O chado-1.2.tar.gz 'http://downloads.sourceforge.net/project/gmod/gmod/chado-1.2/chado-1.2.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fgmod%2Ffiles%2Fgmod%2Fchado-1.2%2F&ts=1415403627&use_mirror=kent'
    #+END_SRC
 
    Following the installation instructions from Lenz thesis, the next
    step is the reduction of the database scheme:
-   #+BEGIN_SRC sh :dir apache_container/
+   #+BEGIN_SRC sh :dir chado_create_container/
      # untar the chado archive
      tar xzf chado-1.2.tar.gz
 
@@ -48,7 +48,7 @@
    #+END_SRC
 
    Additionally, I have to download the obo file for GO terms and convert it into XML
-   #+BEGIN_SRC sh :dir apache_container/
+   #+BEGIN_SRC sh :dir chado_create_container/
      wget -O gene_ontology.1_2.obo 'http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo'
 
      # convertion into xml format this might need the installation of
@@ -329,7 +329,7 @@
    #+END_SRC
 
 ** Installation of Chado database
-   #+BEGIN_SRC sh :tangle apache_container/generate_db.sh :shebang "#!/bin/bash"
+   #+BEGIN_SRC sh :tangle chado_create_container/generate_db.sh :shebang "#!/bin/bash"
      export CHADO_DB_NAME=${CHADO_ENV_DB_NAME:-chado}
      export CHADO_DB_USERNAME=${CHADO_ENV_DB_USER:-tbro}
      export CHADO_DB_PASSWORD=${CHADO_ENV_DB_PW:-tbro}
@@ -375,6 +375,149 @@
      # make the optional targets
      make rm_locks
      make clean
+   #+END_SRC
+
+   We start from the default ubuntu container
+   #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
+     FROM ubuntu
+   #+END_SRC
+
+   #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
+     RUN apt-get update
+     RUN apt-get --assume-yes install \
+         php5-cli \
+         php-pear \
+         php5-pgsql \
+         php5-curl \
+         php5-dev \
+         build-essential
+   #+END_SRC
+
+   Next we need to install phing
+   #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
+     RUN pear channel-discover pear.phing.info
+     RUN pear install --alldeps phing/phing
+     RUN pear channel-discover pear.propelorm.org
+     RUN pear install -a propel/propel_runtime
+     RUN pear install Log
+     RUN pear install Console_CommandLine
+     #RUN pear install Console_Table
+     RUN pear install channel://pear.php.net/Console_ProgressBar-0.5.2beta
+   #+END_SRC
+
+   Modify php.ini to diable phar.readonly
+   #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
+     RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini
+   #+END_SRC
+
+   The Chado installation instruction give the following modules as required for the installation:
+   | module name              | description                | via package manager            |
+   |--------------------------+----------------------------+--------------------------------|
+   | URI::Escape              |                            |                                |
+   | Pod::Usage               |                            |                                |
+   | Config::General          |                            |                                |
+   | DBI                      | gbrowse, chado             | libdbi-perl                    |
+   | DBD::Pg                  | gbrowse, chado             | libdbd-pg-perl                 |
+   | Digest::MD5              |                            |                                |
+   | Module::Build            | chado (installation only)  | libmodule-build-perl           |
+   | Class::DBI               | chado                      | libclass-dbi-perl              |
+   | Class::DBI::Pg           | chado                      | libclass-dbi-pg-perl           |
+   | Class::DBI::Pager        | chado                      | libclass-dbi-pager-perl        |
+   | Class::DBI::View         | chado                      |                                |
+   | XML::Simple              | chado (installation only?) | libxml-simple-perl             |
+   | LWP                      | chado (installation only)  |                                |
+   | Template                 | chado                      | libtemplate-perl               |
+   | Log::Log4perl            | chado                      | liblog-log4perl-perl           |
+   | XML::Parser::PerlSAX     | XORT, Apollo               |                                |
+   | XML::DOM                 | XORT, Apollo               | libxml-dom-perl                |
+   | File::Path               |                            |                                |
+   | Text::Tabs               |                            |                                |
+   | File::Spec               |                            |                                |
+   | XML::Writer              | SOI                        | libxml-writer-perl             |
+   | Graph                    | Chaos                      | libgraph-perl                  |
+   | DBIx::DBStag             | chado, ontology loader     | libdbix-dbstag-perl            |
+   | GO::Parser               | chado, ontology loader     |                                |
+   | XML::LibXSLT             | chaos                      | libxml-libxslt-perl            |
+   | Ima::DBI                 | SGN ontology loader        | libima-dbi-perl                |
+   | Class::MethodMaker       | SGN ontology loader        | libclass-methodmaker-perl      |
+   | URI                      | SGN ontology loader        | liburi-perl                    |
+   | LWP::Simple              | SGN ontology loader        |                                |
+   | XML::Twig                | SGN ontology loader        | libxml-twig-perl               |
+   | Tie::UrlEncoder          | SGN ontology loader        |                                |
+   | HTML::TreeBuilder        | SGN ontology loader        |                                |
+   | Time::HiRes              | SGN ontology loader        |                                |
+   | File::NFSLock            | SGN ontology loader        | libfile-nfslock-perl           |
+   | Class::Data::Inheritable | SGN ontology loader        | libclass-data-inheritable-perl |
+   | IO::Dir                  | chado install util         |                                |
+   | Text::Wrap               | snp2gff?                   |                                |
+
+   Install required perl modules
+   #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
+     RUN apt-get install --assume-yes \
+         libdbi-perl \
+         libdbd-pg-perl \
+         libmodule-build-perl \
+         libclass-dbi-perl \
+         libclass-dbi-pg-perl \
+         libclass-dbi-pager-perl \
+         libxml-simple-perl \
+         libtemplate-perl \
+         liblog-log4perl-perl \
+         libxml-dom-perl \
+         libxml-writer-perl \
+         libgraph-perl \
+         libdbix-dbstag-perl \
+         libxml-libxslt-perl \
+         libima-dbi-perl \
+         libclass-methodmaker-perl \
+         liburi-perl \
+         libxml-twig-perl \
+         libfile-nfslock-perl \
+         libclass-data-inheritable-perl \
+         xsltproc \
+         postgresql-server-dev-all \
+         postgresql-client-9.3 \
+         libgo-perl
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install SQL::Translator'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install URI::Escape'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Pod::Usage'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Config::General'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Digest::MD5'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Class::DBI::View'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install LWP'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install XML::Parser::PerlSAX'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install File::Path'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Text::Tabs'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install File::Spec'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install GO::Parser'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install LWP::Simple'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Tie::UrlEncoder'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install HTML::TreeBuilder'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Time::HiRes'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install IO::Dir'
+     #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Text::Wrap'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install DBD::Pg'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install GO::Utils'
+   #+END_SRC
+
+   Additionally, I want to have the chado code in our image
+   #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
+     ADD chado-1.2.mod.tar.gz /tmp/
+     ADD g_o.1_2.chadoxml.tar.gz /tmp/
+   #+END_SRC
+
+   Additionally, I want to have the script for database-Installation in my image
+   #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
+     ADD generate_db.sh /tmp/chado-1.2/
+   #+END_SRC
+
+   As CMD we would like to run the generate.sh script. First, we set
+   the HOME env var, followed by the creation of a .pgpass file in our
+   home directory. Finally we have to call generate.sh... That's all :)
+   #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
+     CMD export HOME=/tmp/chado-1.2/; \
+         echo "$CHADO_PORT_5432_TCP_ADDR:$CHADO_PORT_5432_TCP_PORT:$CHADO_ENV_DB_NAME:$CHADO_ENV_DB_USER:$CHADO_ENV_DB_PW" > $HOME/.pgpass; \
+         chmod 600 $HOME/.pgpass; $HOME/generate.sh
    #+END_SRC
 
 ** Worker database
