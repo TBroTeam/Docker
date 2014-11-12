@@ -356,7 +356,8 @@
          xsltproc \
          postgresql-server-dev-all \
          postgresql-client-9.3 \
-         libgo-perl
+         libgo-perl \
+         wget
      RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install SQL::Translator'
      RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install URI::Escape'
      RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Pod::Usage'
