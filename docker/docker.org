@@ -205,3 +205,17 @@
      echo "******MODIFYING PG_HBA.CONF FINISHED******"
    #+END_SRC
 
+   #+BEGIN_SRC sh :tangle ./db_container/create_user_db.sh :shebang "#!/bin/bash"
+     # Check if the environment variables CHADO_* exist otherwise take default values
+     CHADO_DB=${CHADO_DATABASE:-chado}
+     CHADO_PW=${CHADO_PASSWORD:-tbro}
+     CHADO_USER=${CHADO_USERNAME:-tbro}
+     echo "******CREATING DOCKER DATABASE******"
+     gosu postgres postgres --single <<- EOSQL
+        CREATE DATABASE $CHADO_DB;
+        CREATE ROLE $CHADO_USER ENCRYPTED PASSWORD '$DRUPAL_PW' NOSUPERUSER CREATEDB NOCREATEROLE INHERIT LOGIN;
+        GRANT ALL PRIVILEGES ON DATABASE $CHADO_DB to $CHADO_USER;
+     EOSQL
+     echo ""
+     echo "******DOCKER DATABASE CREATED******"
+   #+END_SRC
