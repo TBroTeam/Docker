@@ -21,6 +21,11 @@
      mkdir worker_container
    #+END_SRC
 
+   According to the thesis of Lenz, it is required to install Chado
+   1.2 separately. Therefore I need to download the Chado file first.
+   #+BEGIN_SRC sh :dir db_container/
+     wget -O chado-1.2.tar.gz 'http://downloads.sourceforge.net/project/gmod/gmod/chado-1.2/chado-1.2.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fgmod%2Ffiles%2Fgmod%2Fchado-1.2%2F&ts=1415403627&use_mirror=kent'
+   #+END_SRC
    #+results:
 
 ** Database container
