@@ -26,7 +26,25 @@
    #+BEGIN_SRC sh :dir db_container/
      wget -O chado-1.2.tar.gz 'http://downloads.sourceforge.net/project/gmod/gmod/chado-1.2/chado-1.2.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fgmod%2Ffiles%2Fgmod%2Fchado-1.2%2F&ts=1415403627&use_mirror=kent'
    #+END_SRC
-   #+results:
+
+   Following the installation instructions from Lenz thesis, the next
+   step is the reduction of the database scheme:
+   #+BEGIN_SRC sh :dir db_container/
+     # untar the chado archive
+     tar xzf chado-1.2.tar.gz
+
+     # change to newly created folder
+     cd chado-1.2
+
+     # follow the instructions of Lenz:
+     cd modules
+     perl bin/makedep.pl --modules general,cv,pub,organism,sequence,contact,companalysis,mage > default_schema.sql
+     cd ../..
+
+     # create a new archive used for later transfer to image
+     tar czf chado-1.2.mod.tar.gz chado-1.2
+   #+END_SRC
+
 
 ** Database container
    We start from the default postgres container
