@@ -220,3 +220,9 @@
      echo ""
      echo "******DOCKER DATABASE CREATED******"
    #+END_SRC
+
+   Finally I have to add a user to the database
+   #+BEGIN_SRC sh :tangle db_container/Dockerfile
+     ADD fix-acl.sh /docker-entrypoint-initdb.d/
+     ADD create_user_db.sh /docker-entrypoint-initdb.d/
+   #+END_SRC
