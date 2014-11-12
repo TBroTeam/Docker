@@ -97,3 +97,91 @@
      ADD g_o.1_2.chadoxml.tar.gz /tmp/
    #+END_SRC
 
+   The Chado installation instruction give the following modules as required for the installation:
+   | module name              | description                | via package manager            |
+   |--------------------------+----------------------------+--------------------------------|
+   | URI::Escape              |                            |                                |
+   | Pod::Usage               |                            |                                |
+   | Config::General          |                            |                                |
+   | DBI                      | gbrowse, chado             | libdbi-perl                    |
+   | DBD::Pg                  | gbrowse, chado             | libdbd-pg-perl                 |
+   | Digest::MD5              |                            |                                |
+   | Module::Build            | chado (installation only)  | libmodule-build-perl           |
+   | Class::DBI               | chado                      | libclass-dbi-perl              |
+   | Class::DBI::Pg           | chado                      | libclass-dbi-pg-perl           |
+   | Class::DBI::Pager        | chado                      | libclass-dbi-pager-perl        |
+   | Class::DBI::View         | chado                      |                                |
+   | XML::Simple              | chado (installation only?) | libxml-simple-perl             |
+   | LWP                      | chado (installation only)  |                                |
+   | Template                 | chado                      | libtemplate-perl               |
+   | Log::Log4perl            | chado                      | liblog-log4perl-perl           |
+   | XML::Parser::PerlSAX     | XORT, Apollo               |                                |
+   | XML::DOM                 | XORT, Apollo               | libxml-dom-perl                |
+   | File::Path               |                            |                                |
+   | Text::Tabs               |                            |                                |
+   | File::Spec               |                            |                                |
+   | XML::Writer              | SOI                        | libxml-writer-perl             |
+   | Graph                    | Chaos                      | libgraph-perl                  |
+   | DBIx::DBStag             | chado, ontology loader     | libdbix-dbstag-perl            |
+   | GO::Parser               | chado, ontology loader     |                                |
+   | XML::LibXSLT             | chaos                      | libxml-libxslt-perl            |
+   | Ima::DBI                 | SGN ontology loader        | libima-dbi-perl                |
+   | Class::MethodMaker       | SGN ontology loader        | libclass-methodmaker-perl      |
+   | URI                      | SGN ontology loader        | liburi-perl                    |
+   | LWP::Simple              | SGN ontology loader        |                                |
+   | XML::Twig                | SGN ontology loader        | libxml-twig-perl               |
+   | Tie::UrlEncoder          | SGN ontology loader        |                                |
+   | HTML::TreeBuilder        | SGN ontology loader        |                                |
+   | Time::HiRes              | SGN ontology loader        |                                |
+   | File::NFSLock            | SGN ontology loader        | libfile-nfslock-perl           |
+   | Class::Data::Inheritable | SGN ontology loader        | libclass-data-inheritable-perl |
+   | IO::Dir                  | chado install util         |                                |
+   | Text::Wrap               | snp2gff?                   |                                |
+
+   Install required perl modules
+   #+BEGIN_SRC sh :tangle db_container/Dockerfile
+     RUN apt-get install --assume-yes \
+         libdbi-perl \
+         libdbd-pg-perl \
+         libmodule-build-perl \
+         libclass-dbi-perl \
+         libclass-dbi-pg-perl \
+         libclass-dbi-pager-perl \
+         libxml-simple-perl \
+         libtemplate-perl \
+         liblog-log4perl-perl \
+         libxml-dom-perl \
+         libxml-writer-perl \
+         libgraph-perl \
+         libdbix-dbstag-perl \
+         libxml-libxslt-perl \
+         libima-dbi-perl \
+         libclass-methodmaker-perl \
+         liburi-perl \
+         libxml-twig-perl \
+         libfile-nfslock-perl \
+         libclass-data-inheritable-perl \
+         xsltproc \
+         postgresql-server-dev-all
+     RUN PERL_MM_USE_DEFAULT=1 cpan -i \
+         SQL::Translator \
+         URI::Escape \
+         Pod::Usage \
+         Config::General \
+         Digest::MD5 \
+         Class::DBI::View \
+         LWP \
+         XML::Parser::PerlSAX \
+         File::Path \
+         Text::Tabs \
+         File::Spec \
+         GO::Parser \
+         LWP::Simple \
+         Tie::UrlEncoder \
+         HTML::TreeBuilder \
+         Time::HiRes \
+         IO::Dir \
+         Text::Wrap \
+         DBD::Pg
+   #+END_SRC
+
