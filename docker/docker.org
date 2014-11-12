@@ -156,7 +156,7 @@
 
    Generate a TBro image from the commit  82c52be7f
    #+BEGIN_SRC sh :dir ../
-     git archive --format tar.gz --output docker/82c52be7f_Tbro.tar.gz 82c52be7f
+     git archive --format tar.gz --output docker/apache_container/82c52be7f_Tbro.tar.gz 82c52be7f
    #+END_SRC
 
    And copy the TBro archive to the image
