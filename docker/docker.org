@@ -252,6 +252,18 @@
          build-essential
    #+END_SRC
 
+   Next we need to install phing
+   #+BEGIN_SRC sh :tangle apache_container/Dockerfile
+     RUN pear channel-discover pear.phing.info
+     RUN pear install --alldeps phing/phing
+     RUN pear channel-discover pear.propelorm.org
+     RUN pear install -a propel/propel_runtime
+     RUN pear install Log
+     RUN pear install Console_CommandLine
+     RUN pear install Console_Table
+     RUN pear install channel://pear.php.net/Console_ProgressBar-0.5.2beta
+   #+END_SRC
+
 ** Installation of Chado database
    #+BEGIN_SRC sh
      export CHADO_DB_NAME="chado"
