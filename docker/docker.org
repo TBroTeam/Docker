@@ -92,3 +92,8 @@
      ADD ./chado-1.2.mod.tar.gz /tmp/
    #+END_SRC
 
+   Add the ontology-file
+   #+BEGIN_SRC sh :tangle db_container/Dockerfile
+     ADD g_o.1_2.chadoxml.tar.gz /tmp/
+   #+END_SRC
+
