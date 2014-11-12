@@ -233,6 +233,12 @@
      docker run -d --name chado_db_container chado_db
    #+END_SRC
 
+** Apache container
+   We start from the default postgres container
+   #+BEGIN_SRC sh :tangle apache_container/Dockerfile
+     FROM ubuntu
+   #+END_SRC
+
 ** Installation of Chado database
    #+BEGIN_SRC sh
      export CHADO_DB_NAME="chado"
