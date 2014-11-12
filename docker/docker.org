@@ -284,6 +284,11 @@
      ADD 82c52be7f_Tbro.tar.gz /home/
    #+END_SRC
 
+   Finally we start the apache instance
+   #+BEGIN_SRC sh :tangle apache_container/Dockerfile
+     CMD service apache2 start; while true; do sleep 60; done
+   #+END_SRC
+
 ** Installation of Chado database
    #+BEGIN_SRC sh
      export CHADO_DB_NAME="chado"
