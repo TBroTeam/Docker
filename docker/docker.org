@@ -86,3 +86,9 @@
    #+BEGIN_SRC sh :tangle db_container/Dockerfile
      RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini
    #+END_SRC
+
+   Copy the chado-file into the database-container and extract it
+   #+BEGIN_SRC sh :tangle db_container/Dockerfile
+     ADD ./chado-1.2.mod.tar.gz /tmp/
+   #+END_SRC
+
