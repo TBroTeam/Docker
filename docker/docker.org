@@ -14,7 +14,7 @@
    4) Worker container
 
 ** Preparation
-   #+BEGIN_SRC sh 
+   #+BEGIN_SRC sh
      mkdir db_container
      mkdir apache_container
      mkdir memcached_container
