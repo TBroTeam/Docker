@@ -48,7 +48,11 @@
    Additionally, I have to download the obo file for GO terms and convert it into XML
    #+BEGIN_SRC sh :dir db_container/
      wget -O gene_ontology.1_2.obo 'http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo'
-     # TODO
+
+     # convertion into xml format this might need the installation of
+     # additional packages and should be moved into the chade database
+     # generation later
+     go2fmt.pl -p obo_text -w xml gene_ontology.1_2.obo | go-apply-xslt oboxml_to_chadoxml - > g_o.1_2.chadoxml
    #+END_SRC
 
 ** Database container
