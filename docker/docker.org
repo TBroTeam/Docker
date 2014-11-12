@@ -406,3 +406,8 @@
          chmod 600 $HOME/.pgpass; $HOME/generate_db.sh
    #+END_SRC
 
+   Create and run the container
+   #+BEGIN_SRC sh
+     docker build --tag tbro_chado_generate .
+     docker run -i -t --rm --link Chado_DB_4_TBro:CHADO --name "TBro_CHADO_NEW" tbro_chado_generate
+   #+END_SRC
