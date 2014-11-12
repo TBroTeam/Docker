@@ -232,3 +232,51 @@
      docker build --tag chado_db .
      docker run -d --name chado_db_container chado_db
    #+END_SRC
+
+** Installation of Chado database
+   #+BEGIN_SRC sh
+     export CHADO_DB_NAME="chado"
+     export CHADO_DB_USERNAME="tbro"
+     export CHADO_DB_PASSWORD="tbro"
+     export CHADO_DB_HOST="localhost"
+     export CHADO_DB_PORT="5432"
+
+     mkdir -p /usr/local/gmod
+     export GMOD_ROOT=/usr/local/gmod
+
+     cd /tmp/chado-1.2/
+
+     # remove old build.conf if existing
+     if [ -e build.conf ]
+     then
+         rm build.conf
+     fi
+
+     # run the Makefile.PL generator
+     echo "" | perl Makefile.PL
+
+     # the installation name for stag-storenode does not end by an .pl
+     # to circumstand the wrong name I am generating links with the expected names
+     ln -s $(which stag-storenode) $(dirname $(which stag-storenode))/stag-storenode.pl
+
+
+     # run the make commands
+     make
+     make install
+     make load_schema
+     make prepdb
+     make ontologies <<EOF
+     1,2
+     EOF
+
+     # install the prepared GO 1.2
+     stag-storenode.pl \
+         -d 'dbi:Pg:dbname='$CHADO_DB_NAME';host='$CHADO_DB_HOST';port='$CHADO_DB_PORT \
+         --user "$CHADO_DB_USERNAME" \
+         --password "$CHADO_DB_PASSWORD" \
+         ../g_o.1_2.chadoxml
+
+     # make the optional targets
+     make rm_locks
+     make clean
+   #+END_SRC
