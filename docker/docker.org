@@ -19,6 +19,7 @@
      mkdir apache_container
      mkdir memcached_container
      mkdir worker_container
+     mkdir chado_create_container
    #+END_SRC
 
    According to the thesis of Lenz, it is required to install Chado
