@@ -53,6 +53,9 @@
      # additional packages and should be moved into the chade database
      # generation later
      go2fmt.pl -p obo_text -w xml gene_ontology.1_2.obo | go-apply-xslt oboxml_to_chadoxml - > g_o.1_2.chadoxml
+
+     # generation of an tar archive for transfer into the container
+     tar czf g_o.1_2.chadoxml.tar.gz  g_o.1_2.chadoxml
    #+END_SRC
 
 ** Database container
