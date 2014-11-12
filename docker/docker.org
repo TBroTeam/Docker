@@ -155,6 +155,14 @@
 
      srcdir = \${project.basedir}/src
      builddir = /tmp/build/tbro" > /home/tbro/build.properties
+
+     phing database-initialize
+     phing database-commit-modifications
+
+     phing cli-install
+     phing web-install
+
+
    #+END_SRC
 
    And add this script to our image
