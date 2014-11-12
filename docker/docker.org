@@ -260,7 +260,7 @@
      RUN pear install -a propel/propel_runtime
      RUN pear install Log
      RUN pear install Console_CommandLine
-     RUN pear install Console_Table
+     #RUN pear install Console_Table
      RUN pear install channel://pear.php.net/Console_ProgressBar-0.5.2beta
    #+END_SRC
 
