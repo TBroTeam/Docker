@@ -389,12 +389,6 @@
      RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install GO::Utils'
    #+END_SRC
 
-   Additionally, I want to have the chado code in our image
-   #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
-     ADD chado-1.2.mod.tar.gz /tmp/
-     ADD g_o.1_2.chadoxml.tar.gz /tmp/
-   #+END_SRC
-
    Additionally, I want to have the script for database-Installation in my image
    #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
      ADD generate_db.sh /tmp/chado-1.2/
