@@ -165,7 +165,12 @@
      phing cli-install
      phing web-install
 
+     # get the config dir from build.properties
+     . build.properties
 
+     # rename config.php.generated cvterms.php.generated
+     mv $config_dir/config.php.generated $config_dir/config.php
+     mv $config_dir/cvterms.php.generated $config_dir/cvterms.php
    #+END_SRC
 
    And add this script to our image
