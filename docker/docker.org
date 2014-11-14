@@ -209,10 +209,10 @@
      # follow the instructions of Lenz:
      cd modules
      perl bin/makedep.pl --modules general,cv,pub,organism,sequence,contact,companalysis,mage > default_schema.sql
-     cd ..
      date +"[%Y-%m-%d %H:%M:%S] Finished preparation of chado package!"
 
      date +"[%Y-%m-%d %H:%M:%S] Started preparation of GO 1.2..."
+     cd /tmp
      wget -O gene_ontology.1_2.obo 'http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo'
 
      # convertion into xml format this might need the installation of
