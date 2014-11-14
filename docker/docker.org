@@ -119,12 +119,12 @@
 
    Generate a TBro image from the commit  82c52be7f
    #+BEGIN_SRC sh :dir ../
-     git archive --format tar.gz --output docker/apache_container/82c52be7f_Tbro.tar.gz 82c52be7f
+     git archive --format tar.gz --output docker/apache_container/a4fc8edff_Tbro.tar.gz a4fc8edff
    #+END_SRC
 
    And copy the TBro archive to the image
    #+BEGIN_SRC sh :tangle apache_container/Dockerfile
-     ADD 82c52be7f_Tbro.tar.gz /home/tbro/
+     ADD a4fc8edff_Tbro.tar.gz /home/tbro/
    #+END_SRC
 
    Generate a build.properties based on the environmental variables
