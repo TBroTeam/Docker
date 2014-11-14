@@ -156,6 +156,8 @@
      srcdir = \${project.basedir}/src
      builddir = /tmp/build/tbro" > /home/tbro/build.properties
 
+     cd /home/tbro
+
      phing database-initialize
      phing database-commit-modifications
 
