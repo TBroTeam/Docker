@@ -131,10 +131,10 @@
    given to the container. Therefore we need a script:
    #+BEGIN_SRC sh :tangle apache_container/build_installation.sh :shebang "#!/bin/bash"
      echo "
-     prefix = /opt
+     prefix = $PREFIX
      config_dir = \${prefix}/etc/tbro
      bin_dir = \${prefix}/bin
-     www_root = \${prefix}/var/www/tbro
+     www_root = \${prefix}/var/www/html
      share_path = \${prefix}/share/tbro
      var_path = \${prefix}/var/tbro
      autocomplete_path = /etc/bash_completion.d
