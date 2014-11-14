@@ -393,14 +393,14 @@
 
    Additionally, I want to have the script for database-Installation in my image
    #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
-     ADD generate_db.sh /tmp/chado-1.2/
+     ADD generate_db.sh /tmp/
    #+END_SRC
 
    As CMD we would like to run the generate.sh script. First, we set
    the HOME env var, followed by the creation of a .pgpass file in our
    home directory. Finally we have to call generate.sh... That's all :)
    #+BEGIN_SRC sh :tangle chado_create_container/Dockerfile
-     CMD export HOME=/tmp/chado-1.2/; \
+     CMD export HOME=/tmp/; \
          echo "$CHADO_PORT_5432_TCP_ADDR:$CHADO_PORT_5432_TCP_PORT:$CHADO_ENV_DB_NAME:$CHADO_ENV_DB_USER:$CHADO_ENV_DB_PW" > $HOME/.pgpass; \
          chmod 600 $HOME/.pgpass; \
          export PGPASSWORD="$CHADO_ENV_DB_PW"; \
