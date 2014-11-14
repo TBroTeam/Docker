@@ -250,7 +250,7 @@
      make load_schema
      make prepdb
      make ontologies <<EOF
-     1,2
+     1,2,4
      EOF
 
      # install the prepared GO 1.2
