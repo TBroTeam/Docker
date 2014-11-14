@@ -91,7 +91,8 @@
          php5-pgsql \
          php5-curl \
          php5-dev \
-         build-essential
+         build-essential \
+         memcached
    #+END_SRC
 
    Next we need to install phing
