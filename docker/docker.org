@@ -166,7 +166,8 @@
      phing web-install
 
      # get the config dir from build.properties
-     . build.properties
+     eval $(grep "prefix =" build.properties | tr -d " ")
+     eval $(grep "config_dir =" build.properties | tr -d " ")
 
      # rename config.php.generated cvterms.php.generated
      mv $config_dir/config.php.generated $config_dir/config.php
