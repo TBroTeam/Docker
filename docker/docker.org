@@ -552,3 +552,5 @@
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
 *** TODO Der TBro findet die Ajax Webservices nicht - mod_rewrite ist aber an, oder?
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
+*** TODO Remove existing index.html from tbro installation directory
+    - State "TODO"       from ""           [2014-11-15 Sa 09:05]
