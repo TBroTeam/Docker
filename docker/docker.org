@@ -459,7 +459,9 @@ Gute Nacht
 
 *** TODO During TBro installation a more generic appoach for the used commit to checkout
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
-*** INPG own go bricht mit duplicate value ab.
+*** TEST own go bricht mit duplicate value ab.
+    - State "TEST"       from "INPG"       [2014-11-15 Sa 02:11] \\
+      Possible solution have been prepared and need to be tested now
     - State "INPG"       from "TODO"       [2014-11-15 Sa 01:20] \\
       Frank started to work on the issue
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
