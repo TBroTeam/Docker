@@ -1,3 +1,5 @@
+#+TODO: TODO(t!) INPG(i@/!) TEST(n@/!) TESTFAIL(f@/!) TESTPASS(p@/!) | DONE(d!) REJC(c@)
+
 * Installation for TBro using Docker containers
 
 ** General structure
