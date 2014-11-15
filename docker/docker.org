@@ -550,7 +550,18 @@
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
 *** TODO tbro-db organism list geht nicht.
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
-*** TODO Der TBro findet die Ajax Webservices nicht - mod_rewrite ist aber an, oder?
+*** INPG Der TBro findet die Ajax Webservices nicht - mod_rewrite ist aber an, oder?
+    - State "INPG"       from "TODO"       [2014-11-15 Sa 08:40]
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
+The error is even more genetic as almost all links are broken.
+The rewrite rules are obviously not applied although mod_rewrite is enabled.
+The error arises from the apache configuration which by default does not allow .htaccess files to override configuration.
+This can be solved by adding the following block to /etc/apache2/sites-enabled/000-default.conf:
+	<Directory /var/www/html>
+		Options FollowSymLinks
+		AllowOverride All
+	</Directory>
+@Frank: please find a way to automatically include this block or do something equivalent.
 *** TODO Remove existing index.html from tbro installation directory
     - State "TODO"       from ""           [2014-11-15 Sa 09:05]
+
