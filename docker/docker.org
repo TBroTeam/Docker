@@ -259,7 +259,7 @@
      make load_schema
      make prepdb
      make ontologies <<EOF
-     1,2,4
+     1,2
      EOF
 
      # install the prepared GO 1.2
@@ -270,6 +270,11 @@
          --password "$CHADO_DB_PASSWORD" \
          ../g_o.1_2.chadoxml
      date +"[%Y-%m-%d %H:%M:%S] Finished import of own GO 1.2"
+
+     # importing the function ontology as last ontology
+     make ontologies <<EOF
+     4
+     EOF
 
      # make the optional targets
      make rm_locks
@@ -454,8 +459,18 @@ Gute Nacht
 
 *** TODO During TBro installation a more generic appoach for the used commit to checkout
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
-*** TODO own go bricht mit duplicate value ab.
+*** INPG own go bricht mit duplicate value ab.
+    - State "INPG"       from "TODO"       [2014-11-15 Sa 01:20] \\
+      Frank started to work on the issue
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
+
+      My idea is that this issue might be basing on the order we are
+      executing the ontology import. Normally the import order is given
+      by the make ontologies run. We changed that order due to we first
+      import functions during generate_db.sh script followed by the
+      import of our own GO ontology.
+
+      I changed the order of the ontology import.
 *** TODO Man muss build_installation.sh zweimal ausführen. Beim ersten mal fehlt manchen noch die config.php (z.B. den bash_completions)
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
 *** TODO Wir haben den propel Version mismatch
