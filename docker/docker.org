@@ -474,31 +474,31 @@
 ** Issues
   #+BEGIN_QUOTE
   15. Nov. 00:55 - Markus Ankenbrand: Ok ich hab das Funktionen Problem gelöst. War tatsächlich mein Fehler. Hab auch im Docker branch den commit angepasst. Hab beide gepushed. Jetzt klappt auch der import von Sequenz IDs in die DB. Wir haben aber immer noch Probleme:
-1. own go bricht mit duplicate value ab.
-2. Man muss build_installation.sh zweimal ausführen. Beim ersten mal fehlt manchen noch die config.php (z.B. den bash_completions)
-3. Wir haben den propel Version mismatch
-4. tbro-db organism list geht nicht.
-5. Der TBro findet die Ajax Webservices nicht - mod_rewrite ist aber an, oder?
-6. Und das sind nur die Probleme, die ich schon kenne
-Gute Nacht
-15. Nov. 00:59 - Frank Förster: Du sollst schlafen!
-15. Nov. 00:59 - Frank Förster: :)
-15. Nov. 00:59 - Frank Förster: Danke für die Analyse
-15. Nov. 01:00 - Frank Förster: Just one thing...
-15. Nov. 01:01 - Frank Förster: Wir!sollten die ontologies in der richtigen reihenfolge machen
-15. Nov. 01:01 - Frank Förster: Wir machen 1, 2 und 4 und anschließend 3
-15. Nov. 01:01 - Frank Förster: Vielleicht ist es das schon
-15. Nov. 01:02 - Markus Ankenbrand: Gerne 😃 schau ich mir morgen an. Jetzt geh ich erstmal schlafen
-15. Nov. 01:09 - Frank Förster: Das mit dem zweimal build_Installation ist auch schon mist. Darf das drin, dass beim ersten mal etwas fehlt?
-15. Nov. 01:09 - Frank Förster: Ich bin gerade wieder wach geworden
-15. Nov. 01:09 - Frank Förster: Ich schaue mir den Code nochmal an
-15. Nov. 01:10 - Frank Förster: Also vergiss nicht neu pullen :)
-15. Nov. 01:11 - Frank Förster: Mod_rewrite sollte an sein
-15. Nov. 01:12 - Frank Förster: 4. Punkt macht da Sinn?
-15. Nov. 01:12 - Frank Förster: das nicht da
-15. Nov. 01:13 - Frank Förster: Was nehmen wir zum issue tracken? Gleich unsere org file?
-15. Nov. 01:13 - Frank Förster: Oder redmine?
-15. Nov. 01:13 - Frank Förster: Email?
+                   1. own go bricht mit duplicate value ab.
+                   2. Man muss build_installation.sh zweimal ausführen. Beim ersten mal fehlt manchen noch die config.php (z.B. den bash_completions)
+                   3. Wir haben den propel Version mismatch
+                   4. tbro-db organism list geht nicht.
+                   5. Der TBro findet die Ajax Webservices nicht - mod_rewrite ist aber an, oder?
+                   6. Und das sind nur die Probleme, die ich schon kenne
+                   Gute Nacht
+  15. Nov. 00:59 - Frank Förster: Du sollst schlafen!
+  15. Nov. 00:59 - Frank Förster: :)
+  15. Nov. 00:59 - Frank Förster: Danke für die Analyse
+  15. Nov. 01:00 - Frank Förster: Just one thing...
+  15. Nov. 01:01 - Frank Förster: Wir!sollten die ontologies in der richtigen reihenfolge machen
+  15. Nov. 01:01 - Frank Förster: Wir machen 1, 2 und 4 und anschließend 3
+  15. Nov. 01:01 - Frank Förster: Vielleicht ist es das schon
+  15. Nov. 01:02 - Markus Ankenbrand: Gerne 😃 schau ich mir morgen an. Jetzt geh ich erstmal schlafen
+  15. Nov. 01:09 - Frank Förster: Das mit dem zweimal build_Installation ist auch schon mist. Darf das drin, dass beim ersten mal etwas fehlt?
+  15. Nov. 01:09 - Frank Förster: Ich bin gerade wieder wach geworden
+  15. Nov. 01:09 - Frank Förster: Ich schaue mir den Code nochmal an
+  15. Nov. 01:10 - Frank Förster: Also vergiss nicht neu pullen :)
+  15. Nov. 01:11 - Frank Förster: Mod_rewrite sollte an sein
+  15. Nov. 01:12 - Frank Förster: 4. Punkt macht da Sinn?
+  15. Nov. 01:12 - Frank Förster: das nicht da
+  15. Nov. 01:13 - Frank Förster: Was nehmen wir zum issue tracken? Gleich unsere org file?
+  15. Nov. 01:13 - Frank Förster: Oder redmine?
+  15. Nov. 01:13 - Frank Förster: Email?
   #+END_QUOTE
 
 *** TEST Update of database connection during start of apache container
