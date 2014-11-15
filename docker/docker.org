@@ -457,7 +457,9 @@ Gute Nacht
 15. Nov. 01:13 - Frank Förster: Email?
   #+END_QUOTE
 
-*** TODO Update of database connection during start of apache container
+*** INPG Update of database connection during start of apache container
+    - State "INPG"       from "TODO"       [2014-11-14 Fr 17:00] \\
+      Frank started working on the issue
     - State "TODO"       from ""           [2014-11-14 Fr 16:30]
 *** TODO During TBro installation a more generic appoach for the used commit to checkout
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
