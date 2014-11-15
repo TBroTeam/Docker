@@ -162,19 +162,20 @@
 
      cd /home/tbro
 
-     phing database-initialize
-     phing database-commit-modifications
-
-     phing cli-install
-     phing web-install
-
      # get the config dir from build.properties
      eval $(grep "prefix =" build.properties | tr -d " ")
      eval $(grep "config_dir =" build.properties | tr -d " ")
 
+     phing database-initialize
+
      # rename config.php.generated cvterms.php.generated
      mv $config_dir/config.php.generated $config_dir/config.php
      mv $config_dir/cvterms.php.generated $config_dir/cvterms.php
+
+     phing database-commit-modifications
+
+     phing cli-install
+     phing web-install
    #+END_SRC
 
    If the container is started, I need to change the connection
@@ -523,8 +524,15 @@
       import of our own GO ontology.
 
       I changed the order of the ontology import.
-*** TODO Man muss build_installation.sh zweimal ausführen. Beim ersten mal fehlt manchen noch die config.php (z.B. den bash_completions)
+*** INPG Man muss build_installation.sh zweimal ausführen. Beim ersten mal fehlt manchen noch die config.php (z.B. den bash_completions)
+    - State "INPG"       from "TODO"       [2014-11-15 Sa 03:32] \\
+      Frank started working on the issue
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
+
+      I checked the installation guide at Lenz thesis and found the
+      solution. After the initial phing database-initialize command I
+      have to prepare the config files. Therefore I have to reorder
+      the commands in the build_environment.sh script.
 *** TODO Wir haben den propel Version mismatch
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
 *** TODO tbro-db organism list geht nicht.
