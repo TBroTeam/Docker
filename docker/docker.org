@@ -524,7 +524,9 @@
       import of our own GO ontology.
 
       I changed the order of the ontology import.
-*** INPG Man muss build_installation.sh zweimal ausführen. Beim ersten mal fehlt manchen noch die config.php (z.B. den bash_completions)
+*** TEST Man muss build_installation.sh zweimal ausführen. Beim ersten mal fehlt manchen noch die config.php (z.B. den bash_completions)
+    - State "TEST"       from "INPG"       [2014-11-15 Sa 03:42] \\
+      Need to be tested
     - State "INPG"       from "TODO"       [2014-11-15 Sa 03:32] \\
       Frank started working on the issue
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
