@@ -575,7 +575,8 @@
       solution. After the initial phing database-initialize command I
       have to prepare the config files. Therefore I have to reorder
       the commands in the build_environment.sh script.
-*** TESTPASS Wir haben den propel Version mismatch
+*** DONE Wir haben den propel Version mismatch
+    - State "DONE"       from "TESTPASS"   [2014-11-17 Mo 11:15]
     - State "TESTPASS"   from "TODO"       [2014-11-17 Mo 11:14] \\
       Passed test after fixing version to 1.6.8 instead of latest (1.7.1)
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
