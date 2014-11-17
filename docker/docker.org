@@ -165,6 +165,7 @@
      # get the config dir from build.properties
      eval $(grep "prefix =" build.properties | tr -d " ")
      eval $(grep "config_dir =" build.properties | tr -d " ")
+     eval $(grep "www_root =" build.properties | tr -d " ")
 
      phing database-initialize
 
@@ -176,6 +177,11 @@
 
      phing cli-install
      phing web-install
+
+     if [ -e $www_root/index.html ]
+     then
+         rm $www_root/index.html
+     fi
    #+END_SRC
 
    If the container is started, I need to change the connection
@@ -615,6 +621,8 @@
     #+END_QUOTE
     @Frank: please find a way to automatically include this block or do something equivalent.
     Should be finished... Switch to test required!
-*** TODO Remove existing index.html from tbro installation directory
+*** INPG Remove existing index.html from tbro installation directory
+    - State "INPG"       from "TODO"       [2014-11-17 Mo 11:40] \\
+      Markus added rm of $www_root/index.html to build_installation.sh
     - State "TODO"       from ""           [2014-11-15 Sa 09:05]
 
