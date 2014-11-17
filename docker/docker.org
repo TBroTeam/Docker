@@ -242,7 +242,7 @@
 
    Finally we start the apache instance
    #+BEGIN_SRC sh :tangle apache_container/Dockerfile
-     CMD /home/tbro/update_installation.sh; service apache2 start; while true; do sleep 60; done
+     CMD service apache2 start; /home/tbro/update_installation.sh; while true; do sleep 60; done
    #+END_SRC
 
    Creation of the image:
