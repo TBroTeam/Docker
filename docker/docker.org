@@ -621,7 +621,8 @@
     #+END_QUOTE
     @Frank: please find a way to automatically include this block or do something equivalent.
     Should be finished... Switch to test required!
-*** INPG Remove existing index.html from tbro installation directory
+*** TEST Remove existing index.html from tbro installation directory
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 11:44]
     - State "INPG"       from "TODO"       [2014-11-17 Mo 11:40] \\
       Markus added rm of $www_root/index.html to build_installation.sh
     - State "TODO"       from ""           [2014-11-15 Sa 09:05]
