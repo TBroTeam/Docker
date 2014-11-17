@@ -95,7 +95,9 @@
          php5-curl \
          php5-dev \
          build-essential \
-         memcached
+         memcached \
+         postgresql-client-common \
+         postgresql-client-9.3
    #+END_SRC
 
    Next we need to install phing
@@ -745,7 +747,9 @@
     - State "INPG"       from "TODO"       [2014-11-17 Mo 14:00] \\
       Frank started working on the issue
     - State "TODO"       from ""           [2014-11-17 Mo 13:47]
-*** INPG In worker_db the database contains no tables
+*** TEST In worker_db the database contains no tables
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 17:47] \\
+      Install packages postgresql-client-common and postgresql-client-9.3
     - State "INPG"       from "TODO"       [2014-11-17 Mo 17:25] \\
       Markus is working on the issue.
 
