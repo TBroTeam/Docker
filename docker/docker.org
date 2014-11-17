@@ -730,7 +730,9 @@
     - State "TODO"       from ""           [2014-11-17 Mo 11:40]
 *** TODO Add functionality to worker_db image to provide blast db files
     - State "TODO"       from ""           [2014-11-17 Mo 14:07]
-*** INPG Build a blast worker node image
+*** TEST Build a blast worker node image
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 16:25] \\
+      Finished! Needs to be tested!
     - State "INPG"       from "TODO"       [2014-11-17 Mo 14:00] \\
       Frank started working on the issue
     - State "TODO"       from ""           [2014-11-17 Mo 13:47]
