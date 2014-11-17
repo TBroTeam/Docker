@@ -745,5 +745,9 @@
     - State "INPG"       from "TODO"       [2014-11-17 Mo 14:00] \\
       Frank started working on the issue
     - State "TODO"       from ""           [2014-11-17 Mo 13:47]
-*** TODO In worker_db the database contains no tables
+*** INPG In worker_db the database contains no tables
+    - State "INPG"       from "TODO"       [2014-11-17 Mo 17:25] \\
+      Markus is working on the issue.
+
+      It seems, that the problem is a missing psql on the apache2 image
     - State "TODO"       from ""           [2014-11-17 Mo 17:06]
