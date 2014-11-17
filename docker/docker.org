@@ -730,7 +730,9 @@
     - State "TODO"       from ""           [2014-11-17 Mo 11:40]
 *** TODO Add functionality to worker_db image to provide blast db files
     - State "TODO"       from ""           [2014-11-17 Mo 14:07]
-*** TESTFAIL Build a blast worker node image
+*** INPG Build a blast worker node image
+    - State "INPG"       from "TESTFAIL"   [2014-11-17 Mo 16:35] \\
+      Frank restarted working on the issue
     - State "TESTFAIL"   from "TEST"       [2014-11-17 Mo 16:33] \\
       Start script is not working! I need to fix the substitution of the
       variables using the environmental variables.
