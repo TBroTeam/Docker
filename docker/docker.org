@@ -748,8 +748,9 @@
       Frank started working on the issue
     - State "TODO"       from ""           [2014-11-17 Mo 13:47]
 *** TEST In worker_db the database contains no tables
-    - State "TEST"       from "INPG"       [2014-11-17 Mo 17:47] \\
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 17:58] \\
       Install packages postgresql-client-common and postgresql-client-9.3
+      Trying to fix empty worker_db by installing postgresql-client-* packages in apache_image
     - State "INPG"       from "TODO"       [2014-11-17 Mo 17:25] \\
       Markus is working on the issue.
 
