@@ -538,7 +538,9 @@
   15. Nov. 01:13 - Frank Förster: Email?
   #+END_QUOTE
 
-*** TESTFAIL Update of database connection during start of apache container
+*** INPG Update of database connection during start of apache container
+    - State "INPG"       from "TESTFAIL"   [2014-11-17 Mo 13:33] \\
+      Working on the issue
     - State "TESTFAIL"   from "TEST"       [2014-11-17 Mo 13:24] \\
       Failed with Error!: SQLSTATE[08006] [7] fe_sendauth: no password supplied
       Due to wrong variable names
