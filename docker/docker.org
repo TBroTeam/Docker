@@ -577,7 +577,9 @@
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
 *** TODO tbro-db organism list geht nicht.
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
-*** TEST Der TBro findet die Ajax Webservices nicht - mod_rewrite ist aber an, oder?
+*** TESTFAIL Der TBro findet die Ajax Webservices nicht - mod_rewrite ist aber an, oder?
+    - State "TESTFAIL"   from "TEST"       [2014-11-17 Mo 10:12] \\
+      Markus tested the modification an got an error complaining about not beeing a directory.
     - State "TEST"       from "INPG"       [2014-11-17 Mo 10:03] \\
       Added script. Need to be tested!
     - State "INPG"       from "TODO"       [2014-11-15 Sa 08:40]
