@@ -727,7 +727,9 @@
     - State "TODO"       from ""           [2014-11-17 Mo 11:40]
 *** TODO Add functionality to worker_db image to provide blast db files
     - State "TODO"       from ""           [2014-11-17 Mo 14:07]
-*** INPG Build a blast worker node image
+*** TEST Build a blast worker node image
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 17:12] \\
+      Added missing package blast to the package list.
     - State "INPG"       from "TEST"       [2014-11-17 Mo 17:09] \\
       Found another error... The blast-package is not installed! Add the
       package to the package list!
