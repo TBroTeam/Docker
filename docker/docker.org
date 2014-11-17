@@ -660,7 +660,9 @@
     - State "INPG"       from "TODO"       [2014-11-17 Mo 11:40] \\
       Markus added rm of $www_root/index.html to build_installation.sh
     - State "TODO"       from ""           [2014-11-15 Sa 09:05]
-*** TODO Add /C. sativa/ demo data and script to import
+*** INPG Add /C. sativa/ demo data and script to import
+    - State "INPG"       from "TODO"       [2014-11-17 Mo 15:34] \\
+      Packed demo data into .tar.gz archive and started to write a import.sh script
     - State "TODO"       from ""           [2014-11-17 Mo 11:40]
 *** TODO Add functionality to worker_db image to provide blast db files
     - State "TODO"       from ""           [2014-11-17 Mo 14:07]
