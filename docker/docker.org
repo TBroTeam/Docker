@@ -223,7 +223,7 @@
    #+BEGIN_SRC sh :tangle apache_container/Dockerfile
      ADD build_installation.sh /home/tbro/
      ADD update_installation.sh /home/tbro/
-     ADD enable_AllowOverride_Apache2.sed /home/tbro
+     ADD enable_AllowOverride_Apache2.sed /home/tbro/
    #+END_SRC
 
    Run the AllowOverride_Apache2.sed script to enable overwrite all
