@@ -120,14 +120,14 @@
      RUN a2enmod rewrite
    #+END_SRC
 
-   Generate a TBro image from the commit  82c52be7f
+   Generate a TBro image from the commit tagged latest
    #+BEGIN_SRC sh :dir ../
-     git archive --format tar.gz --output docker/apache_container/a4fc8edff_Tbro.tar.gz a4fc8edff
+     git archive --format tar.gz --output docker/apache_container/latest_Tbro.tar.gz latest
    #+END_SRC
 
    And copy the TBro archive to the image
    #+BEGIN_SRC sh :tangle apache_container/Dockerfile
-     ADD a4fc8edff_Tbro.tar.gz /home/tbro/
+     ADD latest_Tbro.tar.gz /home/tbro/
    #+END_SRC
 
    Generate a build.properties based on the environmental variables
