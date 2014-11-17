@@ -103,7 +103,7 @@
      RUN pear channel-discover pear.phing.info
      RUN pear install --alldeps phing/phing
      RUN pear channel-discover pear.propelorm.org
-     RUN pear install -a propel/propel_runtime
+     RUN pear install -a propel/propel_runtime-1.6.8
      RUN pear install Log
      RUN pear install Console_CommandLine
      #RUN pear install Console_Table
