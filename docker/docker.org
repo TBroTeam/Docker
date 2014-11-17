@@ -508,6 +508,70 @@
      docker run -i -t --rm --link Chado_DB_4_TBro:CHADO --name "TBro_CHADO" tbro_chado_generate
    #+END_SRC
 
+** Worker container
+   We start from the default ubuntu image
+   #+BEGIN_SRC sh :tangle worker_container/Dockerfile
+     FROM ubuntu
+   #+END_SRC
+
+   First we update our machine and install the required php packages
+   #+BEGIN_SRC sh :tangle worker_container/Dockerfile
+     RUN apt-get update
+     RUN apt-get --assume-yes install \
+         php5-cli \
+         php5-pgsql \
+         php5-curl
+   #+END_SRC
+
+   Generate a TBro image from the commit tagged latest
+   #+BEGIN_SRC sh :dir ../src/queue/worker-php/ :results output silent
+     git archive --format tar.gz --output ../../../docker/worker_container/latest_worker-unix.tar.gz latest
+   #+END_SRC
+
+   And copy the TBro archive to the image
+   #+BEGIN_SRC sh :tangle worker_container/Dockerfile
+     ADD latest_worker-unix.tar.gz /home/tbro/
+   #+END_SRC
+
+   Generate a build.properties based on the environmental variables
+   given to the container. Therefore we need a script:
+   #+BEGIN_SRC sh :tangle worker_container/worker_build_installation.sh :shebang "#!/bin/bash"
+     echo "
+     queue_db_host=$WORKER_PORT_5432_TCP_ADDR
+     queue_db_name=$WORKER_ENV_DB_NAME
+     queue_db_port=$WORKER_PORT_5432_TCP_PORT
+     queue_db_username=$WORKER_ENV_DB_USER
+     queue_db_password=$WORKER_ENV_DB_PW
+     " > /home/tbro/build.properties
+
+     cd /home/tbro
+
+     . build.properties
+
+     CONFIG=$(cat config.php)
+
+     eval echo $CONFIG
+   #+END_SRC
+
+   And add this script to our image
+   #+BEGIN_SRC sh :tangle worker_container/Dockerfile
+     ADD worker_build_installation.sh /home/tbro/
+   #+END_SRC
+
+   Finally we start the apache instance
+   #+BEGIN_SRC sh :tangle worker_container/Dockerfile
+     CMD while true; do sleep 60; done
+   #+END_SRC
+
+   Creation of the image:
+   #+BEGIN_SRC sh
+     docker build --tag tbro_worker .
+     docker run -d --link Worker_DB_4_TBro:WORKER --name "TBro-Worker" tbro_worker
+
+     ## build the build.properties
+     docker exec -i -t TBro /home/tbro/worker_build_installation.sh
+   #+END_SRC
+
 ** Issues
   #+BEGIN_QUOTE
   15. Nov. 00:55 - Markus Ankenbrand: Ok ich hab das Funktionen Problem gelöst. War tatsächlich mein Fehler. Hab auch im Docker branch den commit angepasst. Hab beide gepushed. Jetzt klappt auch der import von Sequenz IDs in die DB. Wir haben aber immer noch Probleme:
