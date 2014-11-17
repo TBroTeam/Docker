@@ -536,21 +536,17 @@
    Generate a build.properties based on the environmental variables
    given to the container. Therefore we need a script:
    #+BEGIN_SRC sh :tangle worker_container/worker_build_installation.sh :shebang "#!/bin/bash"
-     echo "
-     queue_db_host=$WORKER_PORT_5432_TCP_ADDR
-     queue_db_name=$WORKER_ENV_DB_NAME
-     queue_db_port=$WORKER_PORT_5432_TCP_PORT
-     queue_db_username=$WORKER_ENV_DB_USER
-     queue_db_password=$WORKER_ENV_DB_PW
-     " > /home/tbro/build.properties
-
      cd /home/tbro
 
-     . build.properties
+     # set the correct connection parameter
+     sed -i 's/\${queue_db_host}/'$WORKER_PORT_5432_TCP_ADDR'/' config.php
+     sed -i 's/\${queue_db_name}/'$WORKER_ENV_DB_NAME'/' config.php
+     sed -i 's/\${queue_db_port}/'$WORKER_PORT_5432_TCP_PORT'/' config.php
 
-     CONFIG=$(cat config.php)
+     # set the correct user parameter
+     sed -i 's/\${queue_db_username}/'$WORKER_ENV_DB_USER'/' config.php
+     sed -i 's/\${queue_db_password}/'$WORKER_ENV_DB_PW'/' config.php
 
-     eval echo $CONFIG
    #+END_SRC
 
    And add this script to our image
@@ -560,7 +556,7 @@
 
    Finally we start the apache instance
    #+BEGIN_SRC sh :tangle worker_container/Dockerfile
-     CMD while true; do sleep 60; done
+     CMD while true; do cd /home/tbro; ./worker_build_installation.sh; php ./worker.php config.php; done
    #+END_SRC
 
    Creation of the image:
