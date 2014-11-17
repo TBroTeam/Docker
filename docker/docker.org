@@ -22,6 +22,7 @@
      mkdir worker_container
      mkdir chado_create_container
      mkdir generic_db_container
+     mkdir demo_container
    #+END_SRC
 
 ** Generic database image
@@ -146,40 +147,41 @@
      www_user = www-data
      www_group = www-data
      www_mode = 0777
-
+     
      chado_db_host = $CHADO_PORT_5432_TCP_ADDR
      chado_db_name = $CHADO_ENV_DB_NAME
      chado_db_port = $CHADO_PORT_5432_TCP_PORT
      chado_db_username = $CHADO_ENV_DB_USER
      chado_db_password = $CHADO_ENV_DB_PW
-
+     
      queue_db_host = $WORKER_PORT_5432_TCP_ADDR
      queue_db_name = $WORKER_ENV_DB_NAME
      queue_db_port = $WORKER_PORT_5432_TCP_PORT
      queue_db_username = $WORKER_ENV_DB_USER
      queue_db_password = $WORKER_ENV_DB_PW
-
+     
      srcdir = \${project.basedir}/src
      builddir = /tmp/build/tbro" > /home/tbro/build.properties
-
+     
      cd /home/tbro
-
+     
      # get the config dir from build.properties
      eval $(grep "prefix =" build.properties | tr -d " ")
      eval $(grep "config_dir =" build.properties | tr -d " ")
      eval $(grep "www_root =" build.properties | tr -d " ")
-
+     
      phing database-initialize
-
+     
      # rename config.php.generated cvterms.php.generated
      mv $config_dir/config.php.generated $config_dir/config.php
      mv $config_dir/cvterms.php.generated $config_dir/cvterms.php
-
+     
      phing database-commit-modifications
-
+     
      phing cli-install
      phing web-install
-
+     phing queue-install-db
+     
      if [ -e $www_root/index.html ]
      then
          rm $www_root/index.html
@@ -570,6 +572,34 @@
      ## build the build.properties
      docker exec -i -t TBro /home/tbro/worker_build_installation.sh
    #+END_SRC
+
+** Demo container
+   We start from the tbro_apache image
+   #+BEGIN_SRC sh :tangle demo_container/Dockerfile
+     FROM tbro_apache
+   #+END_SRC
+
+   Generate a TBro image from the commit tagged latest
+   #+BEGIN_SRC sh :dir ../doc/tutorial/cannabis_sativa_demo :results output silent
+     git archive --format tar.gz --output ../../../docker/demo_container/latest_demo-set.tar.gz latest
+   #+END_SRC
+
+   And copy the demo archive to the image
+   #+BEGIN_SRC sh :tangle worker_container/Dockerfile
+     ADD latest_demo-set.tar.gz /home/tbro/demo-set/
+   #+END_SRC
+
+   Finally we start the apache instance
+   #+BEGIN_SRC sh :tangle worker_container/Dockerfile
+     CMD cd /home/tbro; ./build_installation.sh; cd demo-set; ./import_demo_data.sh;
+   #+END_SRC
+
+   Creation of the image:
+   #+BEGIN_SRC sh
+     docker build --tag tbro_demo .
+     docker run --rm -i -t --link Worker_DB_4_TBro:WORKER --link Chado_DB_4_TBro:CHADO --name "TBro-Demo" tbro_demo
+   #+END_SRC
+
 
 ** Issues
   #+BEGIN_QUOTE
