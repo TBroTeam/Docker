@@ -544,7 +544,16 @@
     - State "INPG"       from "TODO"       [2014-11-14 Fr 17:00] \\
       Frank started working on the issue
     - State "TODO"       from ""           [2014-11-14 Fr 16:30]
-*** TODO During TBro installation a more generic appoach for the used commit to checkout
+*** INPG During TBro installation a more generic appoach for the used commit to checkout
+    - State "INPG"       from "TODO"       [2014-11-17 Mo 11:10] \\
+      Frank started to work on this issue
+
+      For a more general approach we need to perform the following steps:
+
+      1) Tag a special commit "latest"
+      2) Use this tag instead of a special SHA1 sum for building the archive
+         during image creation
+      3) Add the new archive to the image
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
 *** TESTFAIL own go bricht mit duplicate value ab.
     - State "TESTFAIL"   from "TEST"       [2014-11-15 Sa 07:49] \\
