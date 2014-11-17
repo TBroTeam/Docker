@@ -529,7 +529,10 @@
   15. Nov. 01:13 - Frank Förster: Email?
   #+END_QUOTE
 
-*** TEST Update of database connection during start of apache container
+*** TESTFAIL Update of database connection during start of apache container
+    - State "TESTFAIL"   from "TEST"       [2014-11-17 Mo 11:30] \\
+      Wrong directory checked (/tmp/tbro instead of /home/tbro) 
+      sed -if not working (unknown option u)
     - State "TEST"       from "INPG"       [2014-11-15 Sa 02:24] \\
       Implementation finished... Test is required
     - State "INPG"       from "TODO"       [2014-11-14 Fr 17:00] \\
