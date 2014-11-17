@@ -559,7 +559,9 @@
     - State "INPG"       from "TODO"       [2014-11-14 Fr 17:00] \\
       Frank started working on the issue
     - State "TODO"       from ""           [2014-11-14 Fr 16:30]
-*** TEST During TBro installation a more generic appoach for the used commit to checkout
+*** DONE During TBro installation a more generic appoach for the used commit to checkout
+    - State "DONE"       from "TESTPASS"   [2014-11-17 Mo 13:39]
+    - State "TESTPASS"   from "TEST"       [2014-11-17 Mo 13:39]
     - State "TEST"       from "INPG"       [2014-11-17 Mo 11:48] \\
       Finished... Need to get tested now.
     - State "INPG"       from "TODO"       [2014-11-17 Mo 11:10] \\
