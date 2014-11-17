@@ -187,13 +187,13 @@
    If the container is started, I need to change the connection
    parameter to the database containers for chado-db and worker-db:
    #+BEGIN_SRC sh :tangle apache_container/update_installation.sh :shebang "#!/bin/bash"
-     if [ ! -e /tmp/tbro ]
+     if [ ! -e /home/tbro ]
      then
          echo "No /home/tbro directory found... Exiting!"
          exit
      fi
 
-     cd /tmp/tbro
+     cd /home/tbro
 
      # check if the build.properties are existing, otherwise we are done
      if [ ! -e build.properties ]
@@ -222,7 +222,10 @@
      s/\(^define('QUEUE_DB_USERNAME', '\).*\(');\)/\1"$WORKER_ENV_USER"\2/;
      s/\(^define('QUEUE_DB_PASSWORD', '\).*\(');\)/\1"$WORKER_ENV_PW"\2/;" > update_config.sed
 
-     sed -if update_config.sed $config_dir/config.php
+     sed -i -f update_config.sed $config_dir/config.php
+
+     # Finally I have to restart the apache
+     service apache2 restart
    #+END_SRC
 
    And add this script to our image
