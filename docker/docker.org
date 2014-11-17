@@ -585,7 +585,10 @@
     - State "TESTPASS"   from "TODO"       [2014-11-17 Mo 11:19] \\
       tbro-db organism list problem was solved by resolving the propel version mismatch issue
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
-*** TEST Der TBro findet die Ajax Webservices nicht - mod_rewrite ist aber an, oder?
+*** DONE Der TBro findet die Ajax Webservices nicht - mod_rewrite ist aber an, oder?
+    - State "DONE"       from "TESTPASS"   [2014-11-17 Mo 11:22]
+    - State "TESTPASS"   from "TEST"       [2014-11-17 Mo 11:21] \\
+      The solution was adding the AllowOverride All directive to the /var/www directory in apache.conf
     - State "TEST"       from "INPG"       [2014-11-17 Mo 10:54] \\
       Need to be tested again
     - State "INPG"       from "TESTFAIL"   [2014-11-17 Mo 10:14] \\
