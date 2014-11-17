@@ -662,3 +662,5 @@
     - State "TODO"       from ""           [2014-11-15 Sa 09:05]
 *** TODO Add /C. sativa/ demo data and script to import
     - State "TODO"       from ""           [2014-11-17 Mo 11:40]
+*** TODO Build a blast worker image
+    - State "TODO"       from ""           [2014-11-17 Mo 13:47]
