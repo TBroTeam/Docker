@@ -538,7 +538,10 @@
   15. Nov. 01:13 - Frank Förster: Email?
   #+END_QUOTE
 
-*** INPG Update of database connection during start of apache container
+*** TEST Update of database connection during start of apache container
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 13:34] \\
+      Wrong variables corrected.
+      Need testing
     - State "INPG"       from "TESTFAIL"   [2014-11-17 Mo 13:33] \\
       Working on the issue
     - State "TESTFAIL"   from "TEST"       [2014-11-17 Mo 13:24] \\
