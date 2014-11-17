@@ -739,3 +739,5 @@
     - State "INPG"       from "TODO"       [2014-11-17 Mo 14:00] \\
       Frank started working on the issue
     - State "TODO"       from ""           [2014-11-17 Mo 13:47]
+*** TODO In worker_db the database contains no tables
+    - State "TODO"       from ""           [2014-11-17 Mo 17:06]
