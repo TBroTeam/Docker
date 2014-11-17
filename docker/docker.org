@@ -537,7 +537,7 @@
 
 *** TESTFAIL Update of database connection during start of apache container
     - State "TESTFAIL"   from "TEST"       [2014-11-17 Mo 11:30] \\
-      Wrong directory checked (/tmp/tbro instead of /home/tbro) 
+      Wrong directory checked (/tmp/tbro instead of /home/tbro)
       sed -if not working (unknown option u)
     - State "TEST"       from "INPG"       [2014-11-15 Sa 02:24] \\
       Implementation finished... Test is required
@@ -549,7 +549,7 @@
 *** TESTFAIL own go bricht mit duplicate value ab.
     - State "TESTFAIL"   from "TEST"       [2014-11-15 Sa 07:49] \\
       Test failed with duplicate value
-      
+
       DBD::Pg::st execute failed: ERROR:  duplicate key value violates unique constraint "cvterm_c2"
       DETAIL:  Key (dbxref_id)=(121) already exists. [for Statement "INSERT INTO cvterm (name, dbxref_id, cv_id, is_relationshiptype) VALUES (?, ?, ?, ?)" with ParamValues: 1='part_of', 2='121', 3='16', 4='1'] at /usr/share/perl5/DBIx/DBStag.pm line 3322.
       DBD::Pg::st execute failed: ERROR:  duplicate key value violates unique constraint "cvterm_c2"
