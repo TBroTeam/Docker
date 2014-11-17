@@ -538,7 +538,10 @@
   15. Nov. 01:13 - Frank Förster: Email?
   #+END_QUOTE
 
-*** TEST Update of database connection during start of apache container
+*** DONE Update of database connection during start of apache container
+    - State "DONE"       from "TESTPASS"   [2014-11-17 Mo 13:44]
+    - State "TESTPASS"   from "TEST"       [2014-11-17 Mo 13:44] \\
+      Test of database connection after restart passed
     - State "TEST"       from "INPG"       [2014-11-17 Mo 13:34] \\
       Wrong variables corrected.
       Need testing
