@@ -528,12 +528,12 @@
          ncbi-blast+
    #+END_SRC
 
-   Generate a TBro image from the commit tagged latest
+   Generate an archive of the worker code tagged latest
    #+BEGIN_SRC sh :dir ../src/queue/worker-php/ :results output silent
      git archive --format tar.gz --output ../../../docker/worker_container/latest_worker-unix.tar.gz latest
    #+END_SRC
 
-   And copy the TBro archive to the image
+   And copy this archive to the image
    #+BEGIN_SRC sh :tangle worker_container/Dockerfile
      ADD latest_worker-unix.tar.gz /home/tbro/
    #+END_SRC
