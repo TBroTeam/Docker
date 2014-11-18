@@ -23,6 +23,7 @@
      mkdir chado_create_container
      mkdir generic_db_container
      mkdir demo_container
+     mkdir worker_ftp_container
    #+END_SRC
 
 ** Generic database image
@@ -566,7 +567,7 @@
    Creation of the image:
    #+BEGIN_SRC sh
      docker build --tag tbro_worker .
-     docker run -d --link Worker_DB_4_TBro:WORKER --name "TBro-Worker" tbro_worker
+     docker run -d --link Worker_DB_4_TBro:WORKER --link Worker_FTP_4_TBro:WORKERFTP --name "TBro-Worker" tbro_worker
 
      ## build the build.properties
      docker exec -i -t TBro /home/tbro/worker_build_installation.sh
@@ -599,6 +600,44 @@
      docker run --rm -i -t --link Worker_DB_4_TBro:WORKER --link Chado_DB_4_TBro:CHADO --name "TBro-Demo" tbro_demo
    #+END_SRC
 
+** WorkerFTP container
+   We start from the generic ubuntu image
+   #+BEGIN_SRC sh :tangle worker_ftp_container/Dockerfile
+     FROM ubuntu
+   #+END_SRC
+
+   First we update our machine and install the required php packages
+   #+BEGIN_SRC sh :tangle worker_ftp_container/Dockerfile
+     RUN apt-get update
+     RUN apt-get --assume-yes install \
+         vsftpd
+   #+END_SRC
+
+   Export the FTP port
+   #+BEGIN_SRC sh :tangle worker_ftp_container/Dockerfile
+     EXPOSE 21
+   #+END_SRC
+
+   Create the empty directory
+   #+BEGIN_SRC sh :tangle worker_ftp_container/Dockerfile
+     RUN mkdir -p /var/run/vsftpd/empty
+   #+END_SRC
+
+   Setup the config file
+   #+BEGIN_SRC sh :tangle worker_ftp_container/Dockerfile
+     RUN echo "listen=YES\nanonymous_enable=yes\nlocal_enable=YES\nwrite_enable=YES\ndirmessage_enable=YES\nuse_localtime=YES\nxferlog_enable=YES\nconnect_from_port_20=YES\nsecure_chroot_dir=/var/run/vsftpd/empty\npam_service_name=vsftpd\nrsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem\nrsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key" > /etc/vsftpd.conf
+   #+END_SRC
+
+   Finally we start the ftp server on startup
+   #+BEGIN_SRC sh :tangle worker_ftp_container/Dockerfile
+     CMD export FTP_USER=${FTP_USER:-ftpuser}; export FTP_PW=${FTP_PW:-ftppassword}; adduser "$FTP_USER"; echo "$FTP_USER":"$FTP_PW" | chpasswd; while true; do vsftpd; done
+   #+END_SRC
+
+   Creation of the image:
+   #+BEGIN_SRC sh
+     docker build --tag tbro_worker_ftp .
+     docker run -d --name "Worker_FTP_4_TBro" tbro_worker_ftp
+   #+END_SRC
 
 ** Issues
   #+BEGIN_QUOTE
