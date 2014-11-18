@@ -828,7 +828,10 @@
     - State "INPG"       from "TODO"       [2014-11-17 Mo 14:00] \\
       Frank started working on the issue
     - State "TODO"       from ""           [2014-11-17 Mo 13:47]
-*** TEST In worker_db the database contains no tables
+*** DONE In worker_db the database contains no tables
+    - State "DONE"       from "TESTPASS"   [2014-11-18 Di 17:00]
+    - State "TESTPASS"   from "TEST"       [2014-11-18 Di 17:00] \\
+      Test passed after installing postgresql-client packages
     - State "TEST"       from "INPG"       [2014-11-17 Mo 17:58] \\
       Install packages postgresql-client-common and postgresql-client-9.3
       Trying to fix empty worker_db by installing postgresql-client-* packages in apache_image
