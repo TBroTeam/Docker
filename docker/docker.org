@@ -343,9 +343,6 @@
      make install
      make load_schema
      make prepdb
-     make ontologies <<EOF
-     1,2
-     EOF
 
      # install the prepared GO 1.2
      date +"[%Y-%m-%d %H:%M:%S] Starting import of own GO 1.2"
@@ -358,7 +355,7 @@
 
      # importing the function ontology as last ontology
      make ontologies <<EOF
-     4
+     1,2,4
      EOF
 
      # make the optional targets
