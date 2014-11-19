@@ -15,7 +15,64 @@
       Maybe better included into TBro website container
    4) Worker container
 
+** Setup procedure
+   #+CALL: prepare() :results output silent
+
+   Detangle all code blocks using Ctrl-c Ctrl-v t
+
+   #+NAME: generate_all_images
+   #+BEGIN_SRC sh :results output silent :dir /sudo::/home/frank/Dokumente/Arbeit/TBro/docker/ :var latest_TBro=latest_Tbro_4_apache() extract_worker=extract_worker() prepare_demo_set=prepare_demo_set()
+     cd generic_db_container
+     docker build --no-cache --tag "greatfireball/generic_postgres_db" . 2> generic_db_container.err > generic_db_container.log
+
+     cd ../apache_container
+     docker build --no-cache --tag tbro_apache . 2> apache_container.err > apache_container.log
+
+     cd ../chado_create_container
+     docker build --no-cache --tag tbro_chado_generate . 2> chado_create_container.err > chado_create_container.log
+
+     cd ../worker_container
+     docker build --no-cache --tag tbro_worker . 2> worker_container.err > worker_container.log
+
+     cd ../worker_ftp_container
+     docker build --no-cache --tag tbro_worker_ftp . 2> worker_ftp_container.err > worker_ftp_container.log
+
+     cd ../demo_container
+     docker build --no-cache --tag tbro_demo . 2> demo_container.err > demo_container.log
+   #+END_SRC
+
+   Start the containers:
+   #+BEGIN_SRC sh
+     # run the tbro demo container
+     docker run --rm -i -t --link Worker_DB_4_TBro:WORKER --link Chado_DB_4_TBro:CHADO --name "TBro-Demo" tbro_demo
+     # we need the database container
+     docker run -d -e DB_NAME=chado -e DB_USER=tbro -e DB_PW=tbro --name "Chado_DB_4_TBro" greatfireball/generic_postgres_db
+     docker run -d -e DB_NAME=worker -e DB_USER=worker -e DB_PW=worker --name "Worker_DB_4_TBro" greatfireball/generic_postgres_db
+
+     # run the tbro apache container
+     docker run -d --link Chado_DB_4_TBro:CHADO --link Worker_DB_4_TBro:WORKER --name "TBro" -p 8090:80 tbro_apache
+
+     # run the tbro chado create container
+     docker run -i -t --rm --link Chado_DB_4_TBro:CHADO --name "TBro_CHADO" tbro_chado_generate
+
+     # run the tbro worker container
+     docker run -d --link Worker_DB_4_TBro:WORKER --link Worker_FTP_4_TBro:WORKERFTP --name "TBro-Worker" tbro_worker
+     docker exec -i -t TBro /home/tbro/worker_build_installation.sh
+
+     # run the tbro worker FTP container
+     docker run -d --name "Worker_FTP_4_TBro" tbro_worker_ftp
+   #+END_SRC
+
+   If required a demo installation can be performed by running:
+   #+NAME: prepare_demo
+   #+BEGIN_SRC sh :dir /sudo::/home/frank/Dokumente/Arbeit/TBro/docker/
+     # run the tbro demo container
+     docker run --rm -i -t --link Worker_DB_4_TBro:WORKER --link Chado_DB_4_TBro:CHADO --name "TBro-Demo" tbro_demo
+   #+END_SRC
+
+
 ** Preparation
+   #+NAME: prepare
    #+BEGIN_SRC sh :results output silent
      mkdir apache_container
      mkdir memcached_container
@@ -125,6 +182,7 @@
    #+END_SRC
 
    Generate a TBro image from the commit tagged latest
+   #+NAME: latest_Tbro_4_apache
    #+BEGIN_SRC sh :dir ../
      git archive --format tar.gz --output docker/apache_container/latest_Tbro.tar.gz latest
    #+END_SRC
@@ -527,6 +585,7 @@
    #+END_SRC
 
    Generate an archive of the worker code tagged latest
+   #+NAME: extract_worker
    #+BEGIN_SRC sh :dir ../src/queue/worker-php/ :results output silent
      git archive --format tar.gz --output ../../../docker/worker_container/latest_worker-unix.tar.gz latest
    #+END_SRC
@@ -577,6 +636,7 @@
    #+END_SRC
 
    Generate a TBro image from the commit tagged latest
+   #+NAME: prepare_demo_set
    #+BEGIN_SRC sh :dir ../doc/tutorial/cannabis_sativa_demo :results output silent
      git archive --format tar.gz --output ../../../docker/demo_container/latest_demo-set.tar.gz latest
    #+END_SRC
