@@ -764,7 +764,9 @@
          during image creation
       3) Add the new archive to the image
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
-*** TESTFAIL own go bricht mit duplicate value ab.
+*** INPG own go bricht mit duplicate value ab.
+    - State "INPG"       from "TESTFAIL"   [2014-11-19 Mi 18:04] \\
+      We have to add two cpan modules to allow the execution of all commands
     - State "TESTFAIL"   from "TEST"       [2014-11-19 Mi 18:03] \\
       Failed again!
     - State "TEST"       from "TESTFAIL"   [2014-11-19 Mi 09:53] \\
