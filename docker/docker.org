@@ -901,5 +901,7 @@
 
       It seems, that the problem is a missing psql on the apache2 image
     - State "TODO"       from ""           [2014-11-17 Mo 17:06]
-*** TODO Change Demo installation to create worker database on FTP
+*** INPG Change Demo installation to create worker database on FTP
+    - State "INPG"       from "TODO"       [2014-11-19 Mi 15:49] \\
+      Frank started working on the issue
     - State "TODO"       from ""           [2014-11-19 Mi 15:35]
