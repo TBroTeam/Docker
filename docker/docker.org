@@ -542,6 +542,8 @@
      #RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Text::Wrap'
      RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install DBD::Pg'
      RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install GO::Utils'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Bio::Root::Version'
+     RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Bio::Chado::Schema'
    #+END_SRC
 
    Additionally, I want to have the script for database-Installation in my image
@@ -764,7 +766,11 @@
          during image creation
       3) Add the new archive to the image
     - State "TODO"       from ""       [2014-11-15 Sa 01:15]
-*** INPG own go bricht mit duplicate value ab.
+*** TEST own go bricht mit duplicate value ab.
+    - State "TEST"       from "INPG"       [2014-11-19 Mi 18:06] \\
+      Added two packages to be installed from cpan!
+
+      Needs testing again!
     - State "INPG"       from "TESTFAIL"   [2014-11-19 Mi 18:04] \\
       We have to add two cpan modules to allow the execution of all commands
     - State "TESTFAIL"   from "TEST"       [2014-11-19 Mi 18:03] \\
