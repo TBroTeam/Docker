@@ -924,3 +924,5 @@
     - State "INPG"       from "TODO"       [2014-11-19 Mi 15:49] \\
       Frank started working on the issue
     - State "TODO"       from ""           [2014-11-19 Mi 15:35]
+*** TODO In each database container give a possibility to dump database with exec command
+    - State "TODO"       from ""           [2014-11-20 Do 09:57]
