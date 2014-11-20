@@ -68,7 +68,7 @@
    #+NAME: prepare_demo
    #+BEGIN_SRC sh :dir /sudo::/tmp/tbro_docker/
      # run the tbro demo container
-     docker run --rm -i -t --link Worker_DB_4_TBro:WORKER --link Chado_DB_4_TBro:CHADO --name "TBro-Demo" tbro_demo
+     docker run --rm -i -t --link Worker_DB_4_TBro:WORKER --link Worker_FTP_4_TBro:WORKERFTP --link Chado_DB_4_TBro:CHADO --name "TBro-Demo" tbro_demo
    #+END_SRC
 
 
