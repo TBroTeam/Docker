@@ -885,7 +885,9 @@
       I will create a modified worker_db image based on the generic ubuntu
       image
     - State "TODO"       from ""           [2014-11-17 Mo 14:07]
-*** TEST Build a blast worker node image
+*** INPG Build a blast worker node image
+    - State "INPG"       from "TEST"       [2014-11-20 Do 14:55] \\
+      Missing packages curl, ftp, and wget!
     - State "TEST"       from "INPG"       [2014-11-18 Di 13:56] \\
       No need to change the hosts file, due to the hostfile already contains
       an entry for WORKER_DB. We just have to use WORKER as hostname for
