@@ -929,7 +929,12 @@
     - State "TODO"       from ""           [2014-11-20 Do 09:57]
 *** TODO Change the ec2kegg mapping commands in demo container
     - State "TODO"       from ""           [2014-11-20 Do 11:52]
-*** INPG Memcached not running and Zend extension not working in apache_tbro container
+*** TEST Memcached not running and Zend extension not working in apache_tbro container
+    - State "TEST"       from "INPG"       [2014-11-20 Do 14:51] \\
+      Added missing package php5-memcache and starting memcached service via
+      CMD command
+
+      Need to be tested now
     - State "INPG"       from "TODO"       [2014-11-20 Do 14:45] \\
       Markus and Frank solved the problem...
       Missing package php5-memcache has to be installed
