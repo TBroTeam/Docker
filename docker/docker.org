@@ -941,7 +941,9 @@
     - State "TODO"       from ""           [2014-11-19 Mi 15:35]
 *** TODO In each database container give a possibility to dump database with exec command
     - State "TODO"       from ""           [2014-11-20 Do 09:57]
-*** TODO Change the ec2kegg mapping commands in demo container
+*** INPG Change the ec2kegg mapping commands in demo container
+    - State "INPG"       from "TODO"       [2014-11-20 Do 12:07] \\
+      Markus started to work on the issue
     - State "TODO"       from ""           [2014-11-20 Do 11:52]
 *** TEST Memcached not running and Zend extension not working in apache_tbro container
     - State "TEST"       from "INPG"       [2014-11-20 Do 14:51] \\
