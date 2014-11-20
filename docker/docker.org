@@ -160,6 +160,7 @@
          php5-dev \
          build-essential \
          memcached \
+         php5-memcache \
          postgresql-client-common \
          postgresql-client-9.3
    #+END_SRC
@@ -310,7 +311,7 @@
 
    Finally we start the apache instance
    #+BEGIN_SRC sh :tangle apache_container/Dockerfile
-     CMD service apache2 start; /home/tbro/update_installation.sh; while true; do sleep 60; done
+     CMD service memcached restart; service apache2 start; /home/tbro/update_installation.sh; while true; do sleep 60; done
    #+END_SRC
 
    Creation of the image:
