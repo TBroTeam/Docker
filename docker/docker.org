@@ -931,7 +931,11 @@
 
       It seems, that the problem is a missing psql on the apache2 image
     - State "TODO"       from ""           [2014-11-17 Mo 17:06]
-*** INPG Change Demo installation to create worker database on FTP
+*** TEST Change Demo installation to create worker database on FTP
+    - State "TEST"       from "INPG"       [2014-11-20 Do 16:04] \\
+      Everything is set up.
+
+      Need to be tested!
     - State "INPG"       from "TODO"       [2014-11-19 Mi 15:49] \\
       Frank started working on the issue
     - State "TODO"       from ""           [2014-11-19 Mi 15:35]
