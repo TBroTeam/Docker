@@ -926,3 +926,5 @@
     - State "TODO"       from ""           [2014-11-19 Mi 15:35]
 *** TODO In each database container give a possibility to dump database with exec command
     - State "TODO"       from ""           [2014-11-20 Do 09:57]
+*** TODO Change the ec2kegg mapping commands in demo container
+    - State "TODO"       from ""           [2014-11-20 Do 11:52]
