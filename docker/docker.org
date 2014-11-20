@@ -54,6 +54,9 @@
      # run the tbro chado create container
      docker run -i -t --rm --link Chado_DB_4_TBro:CHADO --name "TBro_CHADO" tbro_chado_generate 2> run_chado_generate.err > run_chado_generate.log
 
+     # run the build_installation command in the TBro container
+     docker exec -i -t TBro /home/tbro/build_installation.sh 2> tbro_build_installation.err > tbro_build_installation.log
+
      # run the tbro worker FTP container
      docker run -d --name "Worker_FTP_4_TBro" tbro_worker_ftp
 
