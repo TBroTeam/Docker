@@ -888,7 +888,12 @@
       I will create a modified worker_db image based on the generic ubuntu
       image
     - State "TODO"       from ""           [2014-11-17 Mo 14:07]
-*** INPG Build a blast worker node image
+*** TEST Build a blast worker node image
+    - State "TEST"       from "INPG"       [2014-11-20 Do 16:04] \\
+      Fixed wrong keys from job array which might result from our global rebase
+      Fixed demo-set! Missing escape character $ led to empty db parameter in database, but it is required to be $DBFILE
+
+      Need to be tested again!
     - State "INPG"       from "TEST"       [2014-11-20 Do 14:55] \\
       Missing packages curl, ftp, and wget!
     - State "TEST"       from "INPG"       [2014-11-18 Di 13:56] \\
