@@ -16,6 +16,14 @@
    4) Worker container
 
 ** Setup procedure
+   First, we need to stop and remove all Docker contrainer and all
+   images we create in the following steps.
+   #+NAME: stop_delete_old_docker
+   #+BEGIN_SRC sh :dir /sudo::
+     docker rm -f Worker_FTP_4_TBro TBro-Worker TBro Worker_DB_4_TBro Chado_DB_4_TBro
+     docker rmi tbro_demo tbro_worker_ftp tbro_worker tbro_chado_generate tbro_apache greatfireball/generic_postgres_db
+   #+END_SRC
+
    #+CALL: prepare() :results output silent
 
    Detangle all code blocks using Ctrl-c Ctrl-v t
