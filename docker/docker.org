@@ -83,13 +83,15 @@
 ** Preparation
    #+NAME: prepare
    #+BEGIN_SRC sh :results output silent
-     mkdir apache_container
-     mkdir memcached_container
-     mkdir worker_container
-     mkdir chado_create_container
-     mkdir generic_db_container
-     mkdir demo_container
-     mkdir worker_ftp_container
+     for DIRECTORY in apache_container worker_container chado_create_container generic_db_container demo_container worker_ftp_container
+     do
+         if [ -e "$DIRECTORY" ]
+         then
+             rm -rf "$DIRECTORY"
+         fi
+
+         mkdir "$DIRECTORY"
+     done
 
      # generate a link in /tmp to allow root user entering the same
      # directory without knowing the directory path :D
