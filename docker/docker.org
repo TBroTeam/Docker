@@ -383,7 +383,8 @@
 
      date +"[%Y-%m-%d %H:%M:%S] Started download of GO 1.2..."
      cd /tmp
-     wget -O gene_ontology.1_2.obo 'http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo'
+     wget -O gene_ontology.1_2.obo.gz 'ftp://ftp.geneontology.org/go/ontology-archive/gene_ontology_edit.obo.2014-11-01.gz'
+     gunzip gene_ontology.1_2.obo.gz
      date +"[%Y-%m-%d %H:%M:%S] Finished download of GO 1.2!"
 
      # Moved the convertion into xml to a later point in time to exclude problems with different versions
