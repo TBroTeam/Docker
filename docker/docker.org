@@ -29,7 +29,8 @@
    Detangle all code blocks using Ctrl-c Ctrl-v t
 
    #+NAME: generate_all_images
-   #+BEGIN_SRC sh :results output silent :dir /sudo::/tmp/tbro_docker/ :var latest_TBro=latest_Tbro_4_apache() extract_worker=extract_worker() prepare_demo_set=prepare_demo_set()
+   #+BEGIN_SRC sh :results output silent :dir /sudo:: :var latest_TBro=latest_Tbro_4_apache() extract_worker=extract_worker() prepare_demo_set=prepare_demo_set()
+     cd $(readlink /tmp/tbro_docker)
      cd generic_db_container
      docker build --no-cache --tag "greatfireball/generic_postgres_db" . 2> generic_db_container.err > generic_db_container.log
 
