@@ -650,7 +650,7 @@
 
      # importing the function ontology as last ontology
      make ontologies <<EOF
-     1,2,4
+     1,2,4,5
      EOF
 
      # install the prepared GO 1.2
