@@ -37,8 +37,8 @@
      cd ../apache_container
      docker build --no-cache --tag tbro_apache . 2> apache_container.err > apache_container.log
 
-     cd ../chado_create_container
-     docker build --no-cache --tag tbro_chado_generate . 2> chado_create_container.err > chado_create_container.log
+     #cd ../chado_create_container
+     #docker build --no-cache --tag tbro_chado_generate . 2> chado_create_container.err > chado_create_container.log
 
      cd ../worker_container
      docker build --no-cache --tag tbro_worker . 2> worker_container.err > worker_container.log
