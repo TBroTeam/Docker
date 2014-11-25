@@ -21,7 +21,7 @@
    #+NAME: stop_delete_old_docker
    #+BEGIN_SRC sh :dir /sudo::
      docker rm -f Worker_FTP_4_TBro TBro-Worker TBro Worker_DB_4_TBro Chado_DB_4_TBro Generic_CHADO
-     docker rmi tbro_demo tbro_worker_ftp tbro_worker tbro_chado_generate tbro_apache greatfireball/generic_postgres_db  tbro_generic_chado_generate
+     docker rmi tbro_demo tbro_worker_ftp tbro_worker tbro_chado_generate tbro_apache greatfireball/generic_postgres_db  tbro_generic_chado_generate generic_chado_db_reload
    #+END_SRC
 
    #+CALL: prepare() :results output silent
@@ -90,11 +90,11 @@
 ** Preparation
    #+NAME: prepare
    #+BEGIN_SRC sh :results output silent
-     for DIRECTORY in apache_container worker_container chado_create_container generic_db_container demo_container worker_ftp_container generic_chado_create_container
+     for DIRECTORY in apache_container worker_container chado_create_container generic_db_container demo_container worker_ftp_container generic_chado_create_container generic_chado_db_reload_container
      do
          if [ -e "$DIRECTORY" ]
          then
-             rm -rf "$DIRECTORY"
+             find "$DIRECTORY"/ | grep -v "Dockerfile" | grep -v "tar.gz" | xargs rm -rf
          fi
 
          mkdir "$DIRECTORY"
