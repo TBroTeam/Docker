@@ -854,7 +854,7 @@
      DB_USER=${DB_USER:-myuser}
      echo "******IMPORTING CHADO DATABASE******"
      export PGPASSWORD="$DB_PW"
-     cat /tmp/2014-11-24_chado_database_complete_GO1.2.sql | psql -h localhost -U $DB_USER $DB_NAME
+     cat /tmp/2014-11-24_chado_database_complete_GO1.2.sql | gosu postgres postgres --single
      echo "******CHADO DATABASE IMPORTED******"
    #+END_SRC
 
