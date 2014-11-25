@@ -850,7 +850,7 @@
    #+END_SRC
 
    First we update our machine and install the required php packages
-   #+BEGIN_SRC sh :tangle apache_container/Dockerfile
+   #+BEGIN_SRC sh :tangle generic_chado_db_reload_container/Dockerfile
      RUN apt-get update
      RUN apt-get --assume-yes install \
          postgresql-client-common \
@@ -861,7 +861,7 @@
    #+BEGIN_SRC sh :tangle generic_chado_db_reload_container/Dockerfile
      ADD 2014-11-24_chado_database_complete_GO1.2.sql.tar.gz /tmp/
      CMD export PGPASSWORD="$CHADO_ENV_DB_PW"; \
-         cat /tmp/2014-11-24_chado_database_complete_GO1.2.sql | pgsql --host=$CHADO_PORT_5432_TCP_ADDR --port=$CHADO_PORT_5432_TCP_PORT --username=$CHADO_ENV_DB_USER $CHADO_ENV_DB_NAME
+         cat /tmp/2014-11-24_chado_database_complete_GO1.2.sql | psql --host=$CHADO_PORT_5432_TCP_ADDR --port=$CHADO_PORT_5432_TCP_PORT --username=$CHADO_ENV_DB_USER $CHADO_ENV_DB_NAME
 
    #+END_SRC
 
