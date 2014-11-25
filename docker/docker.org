@@ -34,6 +34,9 @@
      cd generic_db_container
      docker build --no-cache --tag "greatfireball/generic_postgres_db" . 2> generic_db_container.err > generic_db_container.log
 
+     cd ../generic_chado_create_container/
+     docker build --tag tbro_generic_chado_generate .  2> chado_generic_create_container.err > chado_generic_create_container.log
+
      cd ../apache_container
      docker build --no-cache --tag tbro_apache . 2> apache_container.err > apache_container.log
 
