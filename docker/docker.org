@@ -29,7 +29,7 @@
    Detangle all code blocks using Ctrl-c Ctrl-v t
 
    #+NAME: generate_all_images
-   #+BEGIN_SRC sh :results output silent :dir /sudo:: :var latest_TBro=latest_Tbro_4_apache() extract_worker=extract_worker() prepare_demo_set=prepare_demo_set()
+   #+BEGIN_SRC sh :results output silent :dir /sudo:: :var latest_TBro=latest_Tbro_4_apache() extract_worker=extract_worker() prepare_demo_set=prepare_demo_set() copy_chado_dump=copy_chado_dump()
      cd $(readlink /tmp/tbro_docker)
      cd generic_db_container
      docker build --no-cache --tag "greatfireball/generic_postgres_db" . 2> generic_db_container.err > generic_db_container.log
@@ -836,7 +836,13 @@
      docker run -i -t --link Chado_DB_4_TBro:CHADO --name "Generic_CHADO" tbro_generic_chado_generate
    #+END_SRC
 ** Load chado database image
-   We start from the default postgres container
+   First we need to copy our Chado DB dump into the correct folder
+   #+NAME: copy_chado_dump
+   #+BEGIN_SRC sh
+     cp 2014-11-24_chado_database_complete_GO1.2.sql.tar.gz generic_chado_db_reload_container/
+   #+END_SRC
+
+   We start with our generic database container
    #+BEGIN_SRC sh :tangle generic_chado_db_reload_container/Dockerfile
      FROM greatfireball/generic_postgres_db
    #+END_SRC
