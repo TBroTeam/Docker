@@ -63,8 +63,9 @@
    #+NAME: run_all_container
    #+BEGIN_SRC sh :results output silent :dir /sudo::/tmp/tbro_docker/
      # we need the database container
-     #docker run -d -e DB_NAME=chado -e DB_USER=tbro -e DB_PW=tbro --name "Chado_DB_4_TBro" greatfireball/generic_postgres_db
-     docker run -d -e DB_NAME=chado -e DB_USER=tbro -e DB_PW=tbro --name "Chado_DB_4_TBro" generic_chado_db_reload
+     docker run -d -e DB_NAME=chado -e DB_USER=tbro -e DB_PW=tbro --name "Chado_DB_4_TBro" greatfireball/generic_postgres_db
+     sleep 60
+     docker run -it --link Chado_DB_4_TBro:CHADO --name "Chado_DB_4_TBro_load" generic_chado_db_reload
      docker run -d -e DB_NAME=worker -e DB_USER=worker -e DB_PW=worker --name "Worker_DB_4_TBro" greatfireball/generic_postgres_db
 
      # run the tbro chado create container
@@ -845,23 +846,23 @@
 
    We start with our generic database container
    #+BEGIN_SRC sh :tangle generic_chado_db_reload_container/Dockerfile
-     FROM greatfireball/generic_postgres_db
+     FROM ubuntu
    #+END_SRC
 
-   #+BEGIN_SRC sh :tangle ./generic_chado_db_reload_container/020_import_chado_db.sh :shebang "#!/bin/bash"
-     DB_NAME=${DB_NAME:-mydatabase}
-     DB_PW=${DB_PW:-mypassword}
-     DB_USER=${DB_USER:-myuser}
-     echo "******IMPORTING CHADO DATABASE******"
-     export PGPASSWORD="$DB_PW"
-     cat /tmp/2014-11-24_chado_database_complete_GO1.2.sql | gosu postgres postgres --single
-     echo "******CHADO DATABASE IMPORTED******"
+   First we update our machine and install the required php packages
+   #+BEGIN_SRC sh :tangle apache_container/Dockerfile
+     RUN apt-get update
+     RUN apt-get --assume-yes install \
+         postgresql-client-common \
+         postgresql-client-9.3
    #+END_SRC
 
    Finally I have to add a user to the database
    #+BEGIN_SRC sh :tangle generic_chado_db_reload_container/Dockerfile
-     ADD 020_import_chado_db.sh /docker-entrypoint-initdb.d/
      ADD 2014-11-24_chado_database_complete_GO1.2.sql.tar.gz /tmp/
+     CMD export PGPASSWORD="$CHADO_ENV_DB_PW"; \
+         cat /tmp/2014-11-24_chado_database_complete_GO1.2.sql | pgsql --host=$CHADO_PORT_5432_TCP_ADDR --port=$CHADO_PORT_5432_TCP_PORT --username=$CHADO_ENV_DB_USER $CHADO_ENV_DB_NAME
+
    #+END_SRC
 
    Create the generic_db_image
