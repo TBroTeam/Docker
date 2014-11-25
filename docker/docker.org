@@ -34,6 +34,9 @@
      cd generic_db_container
      docker build --no-cache --tag "greatfireball/generic_postgres_db" . 2> generic_db_container.err > generic_db_container.log
 
+     cd ../generic_chado_db_reload_container/
+     docker build --tag generic_chado_db_reload .  2> generic_chado_db_reload.err > generic_chado_db_reload.log
+
      cd ../generic_chado_create_container/
      docker build --tag tbro_generic_chado_generate .  2> chado_generic_create_container.err > chado_generic_create_container.log
 
@@ -831,6 +834,32 @@
    #+BEGIN_SRC sh :results output silent
      docker build --tag tbro_generic_chado_generate .
      docker run -i -t --link Chado_DB_4_TBro:CHADO --name "Generic_CHADO" tbro_generic_chado_generate
+   #+END_SRC
+** Load chado database image
+   We start from the default postgres container
+   #+BEGIN_SRC sh :tangle generic_chado_db_reload_container/Dockerfile
+     FROM greatfireball/generic_postgres_db
+   #+END_SRC
+
+   #+BEGIN_SRC sh :tangle ./generic_chado_db_reload_container/020_import_chado_db.sh :shebang "#!/bin/bash"
+     DB_NAME=${DB_NAME:-mydatabase}
+     DB_PW=${DB_PW:-mypassword}
+     DB_USER=${DB_USER:-myuser}
+     echo "******IMPORTING CHADO DATABASE******"
+     gosu postgres postgres --single < /tmp/2014-11-25_chado_database_complete_GO1.2.sql
+     echo "******CHADO DATABASE IMPORTED******"
+   #+END_SRC
+
+   Finally I have to add a user to the database
+   #+BEGIN_SRC sh :tangle generic_chado_db_reload_container/Dockerfile
+     ADD 020_import_chado_db.sh /docker-entrypoint-initdb.d/
+     ADD 2014-11-24_chado_database_complete_GO1.2.sql.tar.gz /tmp/
+   #+END_SRC
+
+   Create the generic_db_image
+   #+BEGIN_SRC sh :results output silent
+     docker build --tag "greatfireball/generic_chado_db_reload" .
+     docker run -d -e DB_NAME=chado -e DB_USER=tbro -e DB_PW=tbro --name "Chado_DB_4_TBro" greatfireball//generic_chado_db_reload
    #+END_SRC
 
 ** Worker container
