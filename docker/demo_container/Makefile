@@ -3,5 +3,5 @@ prepare:
 
 build: prepare
 	docker build --tag tbro_demo .
-run: build
+run:
 	docker run --rm -i -t --link Worker_DB_4_TBro:WORKER --link Chado_DB_4_TBro:CHADO --name "TBro-Demo" tbro_demo

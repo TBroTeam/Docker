@@ -637,7 +637,7 @@ prepare:
 
 build: prepare
 	docker build --tag tbro_chado_generate .
-run: build
+run:
 	docker run -i -t --rm --link Chado_DB_4_TBro:CHADO --name "TBro_CHADO" tbro_chado_generate
    #+END_SRC
 
@@ -877,7 +877,7 @@ prepare:
 
 build: prepare
 	docker build --tag tbro_generic_chado_generate .
-run: build
+run:
 	docker run -i -t --link Chado_DB_4_TBro:CHADO --name "Generic_CHADO" tbro_generic_chado_generate
    #+END_SRC
 
@@ -915,7 +915,7 @@ prepare:
 
 build: prepare
 	docker build --tag "greatfireball/generic_chado_db_reload" .
-run: build
+run:
 	docker run -d -e DB_NAME=chado -e DB_USER=tbro -e DB_PW=tbro --name "Chado_DB_4_TBro" greatfireball/generic_chado_db_reload
    #+END_SRC
 
@@ -978,7 +978,7 @@ prepare:
    #+BEGIN_SRC sh :tangle ../docker/worker_container/Makefile
 build: prepare
 	docker build --tag tbro_worker .
-run: build
+run:
 	docker run -d --link Worker_DB_4_TBro:WORKER --link Worker_FTP_4_TBro:WORKERFTP --name "TBro-Worker" tbro_worker
 	docker exec -i -t TBro /home/tbro/worker_build_installation.sh
    #+END_SRC
@@ -1010,7 +1010,7 @@ prepare:
    #+BEGIN_SRC sh :tangle ../docker/demo_container/Makefile
 build: prepare
 	docker build --tag tbro_demo .
-run: build
+run:
 	docker run --rm -i -t --link Worker_DB_4_TBro:WORKER --link Chado_DB_4_TBro:CHADO --name "TBro-Demo" tbro_demo
    #+END_SRC
 
@@ -1053,7 +1053,7 @@ prepare:
 
 build: prepare
 	docker build --tag tbro_worker_ftp .
-run: build
+run:
 	docker run -d --name "Worker_FTP_4_TBro" tbro_worker_ftp
    #+END_SRC
 
