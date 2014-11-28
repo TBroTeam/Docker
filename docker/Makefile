@@ -1,8 +1,34 @@
-none:
-	echo "Nothing to do"
+SUBDIRS = apache_container chado_create_container demo_container generic_chado_create_container generic_chado_db_reload_container generic_db_container worker_container worker_ftp_container
 
-.PHONY: del_container del_images
-del_container:
-	docker rm -f Worker_FTP_4_TBro TBro-Worker TBro Worker_DB_4_TBro Chado_DB_4_TBro Generic_CHADO
-del_images: del_container
-	docker rmi tbro_demo tbro_worker_ftp tbro_worker tbro_chado_generate tbro_apache greatfireball/generic_postgres_db  tbro_generic_chado_generate generic_chado_db_reload
+define MESSAGE
+***** TBro Docker Installation *****
+
+Here comes the message how to build all TBro docker containers
+endef
+
+export MESSAGE
+
+none:
+	@echo  "$$MESSAGE"
+
+SUBDIRS_PREPARE=$(patsubst %,%.prepare,$(SUBDIRS))
+SUBDIRS_BUILD=$(patsubst %,%.start,$(SUBDIRS))
+SUBDIRS_START=$(patsubst %,%.start,$(SUBDIRS))
+SUBDIRS_STOP=$(patsubst %,%.stop,$(SUBDIRS))
+SUBDIRS_RM=$(patsubst %,%.rm,$(SUBDIRS))
+SUBDIRS_RMI=$(patsubst %,%.rmi,$(SUBDIRS))
+
+.PHONY: $(SUBDIRS_PREPARE)
+$(SUBDIRS_PREPARE):
+	make -C $(@:.prepare=) prepare
+
+.PHONY: $(SUBDIRS_BUILD)
+$(SUBDIRS_BUILD):
+	make -C $(@:.build=) build
+
+.PHONY: prepare
+prepare: $(SUBDIRS_PREPARE)
+
+
+.PHONY: build
+build: $(SUBDIRS_BUILD)
