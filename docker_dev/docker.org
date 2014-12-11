@@ -1295,7 +1295,10 @@ run:
 
       It seems, that the problem is a missing psql on the apache2 image
     - State "TODO"       from ""           [2014-11-17 Mo 17:06]
-*** TEST Change Demo installation to create worker database on FTP
+*** DONE Change Demo installation to create worker database on FTP
+    - State "DONE"       from "TESTPASS"   [2014-12-11 Do 10:55]
+    - State "TESTPASS"   from "TEST"       [2014-12-11 Do 10:54] \\
+      Works fine
     - State "TEST"       from "INPG"       [2014-11-20 Do 16:04] \\
       Everything is set up.
 
