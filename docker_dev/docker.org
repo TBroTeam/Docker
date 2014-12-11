@@ -1222,7 +1222,10 @@ run:
     - State "INPG"       from "TODO"       [2014-11-17 Mo 11:40] \\
       Markus added rm of $www_root/index.html to build_installation.sh
     - State "TODO"       from ""           [2014-11-15 Sa 09:05]
-*** TEST Add /C. sativa/ demo data and script to import
+*** DONE Add /C. sativa/ demo data and script to import
+    - State "DONE"       from "TESTPASS"   [2014-12-11 Do 10:47]
+    - State "TESTPASS"   from "TEST"       [2014-12-11 Do 10:46] \\
+      Test passed demo data succesfully added to demo container
     - State "TEST"       from "INPG"       [2014-11-19 Mi 09:54] \\
       Data and script added for import of all data types
       (only BLAST, unigenes and synonyms/publication missing)
