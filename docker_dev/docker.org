@@ -1316,7 +1316,10 @@ run:
     - State "INPG"       from "TODO"       [2014-11-20 Do 12:07] \\
       Markus started to work on the issue
     - State "TODO"       from ""           [2014-11-20 Do 11:52]
-*** TEST Memcached not running and Zend extension not working in apache_tbro container
+*** DONE Memcached not running and Zend extension not working in apache_tbro container
+    - State "DONE"       from "TESTPASS"   [2014-12-11 Do 10:58]
+    - State "TESTPASS"   from "TEST"       [2014-12-11 Do 10:58] \\
+      Works
     - State "TEST"       from "INPG"       [2014-11-20 Do 14:51] \\
       Added missing package php5-memcache and starting memcached service via
       CMD command
