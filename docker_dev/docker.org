@@ -1308,7 +1308,10 @@ run:
     - State "TODO"       from ""           [2014-11-19 Mi 15:35]
 *** TODO In each database container give a possibility to dump database with exec command
     - State "TODO"       from ""           [2014-11-20 Do 09:57]
-*** TEST Change the ec2kegg mapping commands in demo container
+*** DONE Change the ec2kegg mapping commands in demo container
+    - State "DONE"       from "TESTPASS"   [2014-12-11 Do 10:57]
+    - State "TESTPASS"   from "TEST"       [2014-12-11 Do 10:56] \\
+      Works fine
     - State "TEST"       from "INPG"       [2014-11-20 Do 16:08]
     - State "INPG"       from "TODO"       [2014-11-20 Do 12:07] \\
       Markus started to work on the issue
