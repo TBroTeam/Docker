@@ -1244,7 +1244,15 @@ run:
       I will create a modified worker_db image based on the generic ubuntu
       image
     - State "TODO"       from ""           [2014-11-17 Mo 14:07]
-*** TEST Build a blast worker node image
+*** TESTFAIL Build a blast worker node image
+    - State "TESTFAIL"   from "TEST"       [2014-12-11 Do 10:49] \\
+      The blast worker container does work in general.
+      However the worker_build_installation.sh does only replace the placeholders in config.php once
+      on the first run. After that the IPs are fixed.
+      Therefore it can not connect to the database after docker stop/start even though it is linked
+      against the queue_db_container.
+      This has to be dynamically changed on each start via worker_build_installation.sh or the hostname
+      which is automaticalli changed in /etc/hosts has to be used.
     - State "TEST"       from "INPG"       [2014-11-20 Do 16:04] \\
       Fixed wrong keys from job array which might result from our global rebase
       Fixed demo-set! Missing escape character $ led to empty db parameter in database, but it is required to be $DBFILE
