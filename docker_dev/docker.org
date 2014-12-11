@@ -1232,7 +1232,10 @@ run:
     - State "INPG"       from "TODO"       [2014-11-17 Mo 15:34] \\
       Packed demo data into .tar.gz archive and started to write a import.sh script
     - State "TODO"       from ""           [2014-11-17 Mo 11:40]
-*** TEST Add functionality to worker_db image to provide blast db files
+*** DONE Add functionality to worker_db image to provide blast db files
+    - State "DONE"       from "TESTPASS"   [2014-12-11 Do 10:48]
+    - State "TESTPASS"   from "TEST"       [2014-12-11 Do 10:48] \\
+      Test passed: The worker ftp container provides the required blastdb files via ftp
     - State "TEST"       from "INPG"       [2014-11-18 Di 16:54] \\
       Finished implementation... Now the image has to be tested!
     - State "INPG"       from "TODO"       [2014-11-18 Di 14:11] \\
