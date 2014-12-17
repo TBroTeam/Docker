@@ -1244,7 +1244,12 @@ run:
       I will create a modified worker_db image based on the generic ubuntu
       image
     - State "TODO"       from ""           [2014-11-17 Mo 14:07]
-*** TESTFAIL Build a blast worker node image
+*** DONE Build a blast worker node image
+    - State "DONE"       from "TESTPASS"   [2014-12-17 Mi 14:44]
+    - State "TESTPASS"   from "TEST"       [2014-12-17 Mi 14:44] \\
+      Test passed with static hostname
+    - State "TEST"       from "TESTFAIL"   [2014-12-17 Mi 14:43] \\
+      Changed IP-env variable to static hostname
     - State "TESTFAIL"   from "TEST"       [2014-12-11 Do 10:49] \\
       The blast worker container does work in general.
       However the worker_build_installation.sh does only replace the placeholders in config.php once
