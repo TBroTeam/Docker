@@ -941,7 +941,7 @@ run:
    Generate an archive of the worker code tagged latest
    #+BEGIN_SRC sh :tangle ../docker/worker_container/Makefile
 prepare:
-	git -C ../../ archive --format tar.gz --output $$PWD/latest_worker-unix.tar.gz latest src/queue/worker-php/
+	git -C ../../src/queue/worker-php archive --format tar.gz --output $$PWD/latest_worker-unix.tar.gz latest .
    #+END_SRC
 
    And copy this archive to the image
