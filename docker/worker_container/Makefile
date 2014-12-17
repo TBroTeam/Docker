@@ -1,6 +1,5 @@
 prepare:
-	git -C ../../ archive --format tar.gz --output $$PWD/latest_worker-unix.tar.gz latest src/queue/worker-php/
-
+	git -C ../../src/queue/worker-php archive --format tar.gz --output $$PWD/latest_worker-unix.tar.gz latest .
 build: prepare
 	docker build --tag tbro_worker .
 run:

@@ -2,7 +2,7 @@
      cd /home/tbro
 
      # set the correct connection parameter
-     sed -i 's/\${queue_db_host}/'$WORKER_PORT_5432_TCP_ADDR'/' config.php
+     sed -i 's/\${queue_db_host}/'WORKER'/' config.php
      sed -i 's/\${queue_db_name}/'$WORKER_ENV_DB_NAME'/' config.php
      sed -i 's/\${queue_db_port}/'$WORKER_PORT_5432_TCP_PORT'/' config.php
 
