@@ -146,7 +146,7 @@ build: $(SUBDIRS_BUILD)
 ** Generic database image
    We start from the default postgres container
    #+BEGIN_SRC sh :tangle ../docker/generic_db_container/Dockerfile
-     FROM postgres:9.3
+     FROM postgres:9.4
    #+END_SRC
 
    #+BEGIN_SRC sh :tangle ../docker/generic_db_container/000_fix-acl.sh :shebang "#!/bin/bash"
