@@ -1,4 +1,4 @@
-SUBDIRS = apache_container chado_create_container demo_container generic_chado_create_container generic_chado_db_reload_container generic_db_container worker_container worker_ftp_container
+SUBDIRS = apache_container chado_create_container demo_container generic_chado_create_container generic_chado_db_reload_container worker_container worker_ftp_container
 
 define MESSAGE
 ***** TBro Docker Installation *****

@@ -1,5 +1,6 @@
 prepare:
 	git -C ../../ archive --format tar.gz --output $$PWD/latest_demo-set.tar.gz latest doc/tutorial/cannabis_sativa_demo
+
 build: prepare
 	docker build --tag tbro_demo .
 run:
