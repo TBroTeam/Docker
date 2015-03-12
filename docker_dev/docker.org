@@ -190,7 +190,8 @@ RUN a2enmod rewrite
    #+NAME: latest_Tbro_4_apache
    #+BEGIN_SRC makefile :tangle ../docker/apache_container/Makefile
 prepare:
-	git -C ../../ archive --format tar.gz --output $$PWD/latest_Tbro.tar.gz latest ./build.properties.example  ./build.xml  ./db  ./INSTALLATION  ./jmeter_tests  ./nbproject  ./src
+	git clone https://github.com/TBroTeam/TBro latest_Tbro
+	tar -czf $$PWD/latest_Tbro.tar.gz latest_Tbro
    #+END_SRC
 
    And copy the TBro archive to the image
@@ -931,7 +932,8 @@ FROM tbro_apache
    #+NAME: prepare_demo_set
    #+BEGIN_SRC makefile :tangle ../docker/demo_container/Makefile
 prepare:
-	git -C ../../ archive --format tar.gz --output $$PWD/latest_demo-set.tar.gz latest doc/tutorial/cannabis_sativa_demo
+	git clone https://github.com/TBroTeam/DemoData
+	tar czf $$PWD/latest_demo-set.tar.gz DemoData/cannabis_sativa_demo
    #+END_SRC
 
    And copy the demo archive to the image
