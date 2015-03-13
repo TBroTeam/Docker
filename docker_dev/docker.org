@@ -190,6 +190,7 @@ RUN a2enmod rewrite
    Clone the current TBro repository from GitHub and copy the content of the master branch to /home/tbro
    #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
 RUN git clone https://github.com/TBroTeam/TBro.git /tmp/tbro && cd /tmp/tbro && git checkout master
+RUN mkdir -p /home/tbro/
 RUN cp -r /tmp/tbro/* /home/tbro/
    #+END_SRC
 

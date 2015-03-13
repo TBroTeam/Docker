@@ -29,6 +29,7 @@ RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini
 RUN a2enmod rewrite
 
 RUN git clone https://github.com/TBroTeam/TBro.git /tmp/tbro && cd /tmp/tbro && git checkout master
+RUN mkdir -p /home/tbro/
 RUN cp -r /tmp/tbro/* /home/tbro/
 
 ADD build_installation.sh /home/tbro/
