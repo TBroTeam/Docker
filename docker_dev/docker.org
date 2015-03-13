@@ -28,10 +28,10 @@ docker pull tbroteam/tbro_worker
 docker pull tbroteam/tbro_apache
 docker pull tbroteam/tbro_demo
 
-docker run -d -e DB_NAME=chado -e DB_USER=tbro -e DB_PW=tbro --name "Chado_DB_4_TBro" greatfireball/generic_postgres_db
+docker run -d -e DB_NAME=chado -e DB_USER=tbro -e DB_PW=tbro --name "Chado_DB_4_TBro_official" greatfireball/generic_postgres_db
 sleep 60
-docker run -it --link Chado_DB_4_TBro:CHADO --name "Chado_DB_4_TBro_load" tbroteam/generic_chado_db_reload
-docker run -d -e DB_NAME=worker -e DB_USER=worker -e DB_PW=worker --name "Worker_DB_4_TBro" greatfireball/generic_postgres_db
+docker run -it --link Chado_DB_4_TBro:CHADO --name "Chado_DB_4_TBro_load_official" tbroteam/generic_chado_db_reload
+docker run -d -e DB_NAME=worker -e DB_USER=worker -e DB_PW=worker --name "Worker_DB_4_TBro_official" greatfireball/generic_postgres_db
 
 # run the tbro chado create container
 #docker run -i -t --rm --link Chado_DB_4_TBro:CHADO --name "TBro_CHADO" tbro_chado_generate 2> run_chado_generate.err > run_chado_generate.log
@@ -40,23 +40,23 @@ docker run -d -e DB_NAME=worker -e DB_USER=worker -e DB_PW=worker --name "Worker
 #docker run -i -t --link Chado_DB_4_TBro:CHADO --name "Generic_CHADO" tbro_generic_chado_generate
 
 # run the tbro worker FTP container
-docker run -d --name "Worker_FTP_4_TBro" -e FTP_USER="tbro" -e FTP_PW="ftp" tbroteam/tbro_worker_ftp
+docker run -d --name "Worker_FTP_4_TBro_official" -e FTP_USER="tbro" -e FTP_PW="ftp" tbroteam/tbro_worker_ftp
 
 # run the tbro worker container
-docker run -d --link Worker_DB_4_TBro:WORKER --link Worker_FTP_4_TBro:WORKERFTP --name "TBro-Worker" tbroteam/tbro_worker
-docker exec -i -t TBro /home/tbro/worker_build_installation.sh 2> run_worker_build_installation.err > run_worker_build_installation.log
+docker run -d --link Worker_DB_4_TBro:WORKER --link Worker_FTP_4_TBro:WORKERFTP --name "TBro_Worker_official" tbroteam/tbro_worker
+docker exec -i -t TBro_Worker_offical /home/tbro/worker_build_installation.sh 2> run_worker_build_installation.err > run_worker_build_installation.log
 
 # run the tbro apache container
-docker run -d --link Chado_DB_4_TBro:CHADO --link Worker_FTP_4_TBro:WORKERFTP --link Worker_DB_4_TBro:WORKER --name "TBro" -p 8090:80 tbroteam/tbro_apache
+docker run -d --link Chado_DB_4_TBro_official:CHADO --link Worker_FTP_4_TBro_official:WORKERFTP --link Worker_DB_4_TBro_official:WORKER --name "TBro_official" -p 80:80 tbroteam/tbro_apache
 # and run the build_installation command in the TBro container
-docker exec -i -t TBro /home/tbro/build_installation.sh 2> tbro_build_installation.err > tbro_build_installation.log
+docker exec -i -t TBro_official /home/tbro/build_installation.sh 2> tbro_build_installation.err > tbro_build_installation.log
    #+END_SRC
 
    If required a demo installation can be performed by running:
    #+NAME: prepare_demo
    #+BEGIN_SRC sh :dir /sudo::/tmp/tbro_docker/
 # run the tbro demo container
-docker run --rm -i -t --link Worker_DB_4_TBro:WORKER --link Worker_FTP_4_TBro:WORKERFTP --link Chado_DB_4_TBro:CHADO --name "TBro-Demo" tbroteam/tbro_demo
+docker run --rm -i -t --link Worker_DB_4_TBro_official:WORKER --link Worker_FTP_4_TBro_official:WORKERFTP --link Chado_DB_4_TBro_official:CHADO --name "TBro_Demo_official" tbroteam/tbro_demo
    #+END_SRC
 
 ** DONE Apache container
