@@ -822,11 +822,7 @@ run:
    #+END_SRC
 
 ** Load chado database image
-   First we need to copy our Chado DB dump into the correct folder
-   #+NAME: copy_chado_dump
-   #+BEGIN_SRC sh
-cp 2014-11-24_chado_database_complete_GO1.2.sql.tar.gz generic_chado_db_reload_container/
-   #+END_SRC
+   The current Chado DB dump is linked to our docker_dev folder
 
    We start with our generic database container
    #+BEGIN_SRC sh :tangle ../docker/generic_chado_db_reload_container/Dockerfile
@@ -843,19 +839,9 @@ cp 2014-11-24_chado_database_complete_GO1.2.sql.tar.gz generic_chado_db_reload_c
 
    Finally I have to add a user to the database
    #+BEGIN_SRC sh :tangle ../docker/generic_chado_db_reload_container/Dockerfile
-ADD 2014-11-24_chado_database_complete_GO1.2.sql.tar.gz /tmp/
+ADD chado_database_complete.sql.tar.gz /tmp/
 CMD export PGPASSWORD="$CHADO_ENV_DB_PW"; \
-    cat /tmp/2014-11-24_chado_database_complete_GO1.2.sql | psql --host=$CHADO_PORT_5432_TCP_ADDR --port=$CHADO_PORT_5432_TCP_PORT --username=$CHADO_ENV_DB_USER $CHADO_ENV_DB_NAME
-   #+END_SRC
-
-   Create the generic_db_image
-   #+BEGIN_SRC makefile :tangle ../docker/generic_chado_db_reload_container/Makefile
-prepare:
-
-build: prepare
-	docker build --tag "greatfireball/generic_chado_db_reload" .
-run:
-	docker run -d -e DB_NAME=chado -e DB_USER=tbro -e DB_PW=tbro --name "Chado_DB_4_TBro" greatfireball/generic_chado_db_reload
+    cat /tmp/chado_database_complete.sql | psql --host=$CHADO_PORT_5432_TCP_ADDR --port=$CHADO_PORT_5432_TCP_PORT --username=$CHADO_ENV_DB_USER $CHADO_ENV_DB_NAME
    #+END_SRC
 
 ** Worker container
