@@ -8,9 +8,12 @@ RUN apt-get --assume-yes install \
     ncbi-blast+ \
     wget \
     curl \
-    ftp
+    ftp \
+    git
 
-ADD latest_worker-unix.tar.gz /home/tbro/
+RUN mkdir -p /home/tbro
+RUN cd /tmp && git clone https://github.com/TBroTeam/TBro.git
+RUN cd /tmp/TBro && git checkout master && cp -r src/queue/worker-php/* /home/tbro/
 
 ADD worker_build_installation.sh /home/tbro/
 

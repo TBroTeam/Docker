@@ -874,18 +874,15 @@ RUN apt-get --assume-yes install \
     ncbi-blast+ \
     wget \
     curl \
-    ftp
+    ftp \
+    git
    #+END_SRC
 
-   Generate an archive of the worker code tagged latest
-   #+BEGIN_SRC makefile :tangle ../docker/worker_container/Makefile
-prepare:
-	git -C ../../src/queue/worker-php archive --format tar.gz --output $$PWD/latest_worker-unix.tar.gz latest .
-   #+END_SRC
-
-   And copy this archive to the image
+   Checkout the current worker code and copy it to the /home/tbro folder
    #+BEGIN_SRC sh :tangle ../docker/worker_container/Dockerfile
-ADD latest_worker-unix.tar.gz /home/tbro/
+RUN mkdir -p /home/tbro
+RUN cd /tmp && git clone https://github.com/TBroTeam/TBro.git
+RUN cd /tmp/TBro && git checkout master && cp -r src/queue/worker-php/* /home/tbro/
    #+END_SRC
 
    Generate a build.properties based on the environmental variables
@@ -911,15 +908,6 @@ ADD worker_build_installation.sh /home/tbro/
    Finally we start the apache instance
    #+BEGIN_SRC sh :tangle ../docker/worker_container/Dockerfile
 CMD while true; do cd /home/tbro; ./worker_build_installation.sh; php ./worker.php config.php; done
-   #+END_SRC
-
-   Creation of the image:
-   #+BEGIN_SRC makefile :tangle ../docker/worker_container/Makefile
-build: prepare
-	docker build --tag tbro_worker .
-run:
-	docker run -d --link Worker_DB_4_TBro:WORKER --link Worker_FTP_4_TBro:WORKERFTP --name "TBro-Worker" tbro_worker
-	docker exec -i -t TBro /home/tbro/worker_build_installation.sh
    #+END_SRC
 
 ** Demo container
