@@ -161,7 +161,8 @@ RUN apt-get --assume-yes install \
     memcached \
     php5-memcache \
     postgresql-client-common \
-    postgresql-client-9.3
+    postgresql-client-9.3 \
+    git
    #+END_SRC
 
    Next we need to install phing
@@ -186,17 +187,10 @@ RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini
 RUN a2enmod rewrite
    #+END_SRC
 
-   Generate a TBro image from the commit tagged latest
-   #+NAME: latest_Tbro_4_apache
-   #+BEGIN_SRC makefile :tangle ../docker/apache_container/Makefile
-prepare:
-	git clone https://github.com/TBroTeam/TBro latest_Tbro
-	tar -czf $$PWD/latest_Tbro.tar.gz latest_Tbro
-   #+END_SRC
-
-   And copy the TBro archive to the image
+   Clone the current TBro repository from GitHub and copy the content of the master branch to /home/tbro
    #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
-ADD latest_Tbro.tar.gz /home/tbro/
+RUN git clone https://github.com/TBroTeam/TBro.git /tmp/tbro && cd /tmp/tbro && git checkout master
+RUN cp -r /tmp/tbro/* /home/tbro/
    #+END_SRC
 
    Generate a build.properties based on the environmental variables
@@ -313,15 +307,6 @@ RUN sed -i -f /home/tbro/enable_AllowOverride_Apache2.sed /etc/apache2/apache2.c
    Finally we start the apache instance
    #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
 CMD service memcached restart; service apache2 start; /home/tbro/update_installation.sh; while true; do sleep 60; done
-   #+END_SRC
-
-   Creation of the image:
-   #+BEGIN_SRC makefile :tangle ../docker/apache_container/Makefile
-build: prepare
-	docker build --tag tbro_apache .
-run: build
-	docker run -d --link Chado_DB_4_TBro:CHADO --link Worker_DB_4_TBro:WORKER --name "TBro" -p 8090:80 tbro_apache
-	docker exec -i -t TBro /home/tbro/build_installation.sh
    #+END_SRC
 
     #+BEGIN_SRC sh :tangle ../docker/apache_container/enable_AllowOverride_Apache2.sed

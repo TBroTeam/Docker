@@ -12,7 +12,8 @@ RUN apt-get --assume-yes install \
     memcached \
     php5-memcache \
     postgresql-client-common \
-    postgresql-client-9.3
+    postgresql-client-9.3 \
+    git
 
 RUN pear channel-discover pear.phing.info
 RUN pear install --alldeps phing/phing
@@ -27,7 +28,8 @@ RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini
 
 RUN a2enmod rewrite
 
-ADD latest_Tbro.tar.gz /home/tbro/
+RUN git clone https://github.com/TBroTeam/TBro.git /tmp/tbro && cd /tmp/tbro && git checkout master
+RUN cp -r /tmp/tbro/* /home/tbro/
 
 ADD build_installation.sh /home/tbro/
 ADD update_installation.sh /home/tbro/
