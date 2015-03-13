@@ -332,7 +332,8 @@ CMD service memcached restart; service apache2 start; /home/tbro/update_installa
 }
     #+END_SRC
 
-** Installation of Chado database
+** TODO Installation of Chado database
+   - State "TODO"       from ""           [2015-03-13 Fr 14:21]
    #+BEGIN_SRC sh :tangle ../docker/chado_create_container/generate_db.sh :shebang "#!/bin/bash"
 export CHADO_DB_NAME=${CHADO_ENV_DB_NAME:-chado}
 export CHADO_DB_USERNAME=${CHADO_ENV_DB_USER:-tbro}
@@ -569,7 +570,8 @@ run:
 	docker run -i -t --rm --link Chado_DB_4_TBro:CHADO --name "TBro_CHADO" tbro_chado_generate
    #+END_SRC
 
-** Installation of generic Chado database
+** TODO Installation of generic Chado database
+   - State "TODO"       from ""           [2015-03-13 Fr 14:21]
    #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/generate_db.sh :shebang "#!/bin/bash"
 export CHADO_DB_NAME=${CHADO_ENV_DB_NAME:-chado}
 export CHADO_DB_USERNAME=${CHADO_ENV_DB_USER:-tbro}
