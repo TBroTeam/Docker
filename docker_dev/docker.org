@@ -975,16 +975,6 @@ RUN echo "listen=YES\nanonymous_enable=yes\nlocal_enable=YES\nanon_root=/home/tb
 CMD export FTP_USER=${FTP_USER:-ftpuser}; export FTP_PW=${FTP_PW:-ftppassword}; adduser "$FTP_USER"; echo "$FTP_USER":"$FTP_PW" | chpasswd; while true; do vsftpd; done
    #+END_SRC
 
-   Creation of the image:
-   #+BEGIN_SRC makefile :tangle ../docker/worker_ftp_container/Makefile
-prepare:
-
-build: prepare
-	docker build --tag tbro_worker_ftp .
-run:
-	docker run -d --name "Worker_FTP_4_TBro" tbro_worker_ftp
-   #+END_SRC
-
 ** Issues
   #+BEGIN_QUOTE
   15. Nov. 00:55 - Markus Ankenbrand: Ok ich hab das Funktionen Problem gelöst. War tatsächlich mein Fehler. Hab auch im Docker branch den commit angepasst. Hab beide gepushed. Jetzt klappt auch der import von Sequenz IDs in die DB. Wir haben aber immer noch Probleme:
