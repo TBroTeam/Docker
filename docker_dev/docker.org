@@ -141,7 +141,9 @@ done
 ln -s $PWD /tmp/tbro_docker
    #+END_SRC
 
-** Apache container
+** DONE Apache container
+   CLOSED: [2015-03-13 Fr 14:22]
+   - State "DONE"       from ""           [2015-03-13 Fr 14:22]
    We start from the default postgres container
    #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
 FROM ubuntu
@@ -807,7 +809,9 @@ run:
 	docker run -i -t --link Chado_DB_4_TBro:CHADO --name "Generic_CHADO" tbro_generic_chado_generate
    #+END_SRC
 
-** Load chado database image
+** DONE Load chado database image
+   CLOSED: [2015-03-13 Fr 14:21]
+   - State "DONE"       from ""           [2015-03-13 Fr 14:21]
    The current Chado DB dump is linked to our docker_dev folder
 
    We start with our generic database container
@@ -830,7 +834,9 @@ CMD export PGPASSWORD="$CHADO_ENV_DB_PW"; \
     cat /tmp/chado_database_complete.sql | psql --host=$CHADO_PORT_5432_TCP_ADDR --port=$CHADO_PORT_5432_TCP_PORT --username=$CHADO_ENV_DB_USER $CHADO_ENV_DB_NAME
    #+END_SRC
 
-** Worker container
+** DONE Worker container
+   CLOSED: [2015-03-13 Fr 14:22]
+   - State "DONE"       from ""           [2015-03-13 Fr 14:22]
    We start from the default ubuntu image
    #+BEGIN_SRC sh :tangle ../docker/worker_container/Dockerfile
 FROM ubuntu
@@ -882,7 +888,9 @@ ADD worker_build_installation.sh /home/tbro/
 CMD while true; do cd /home/tbro; ./worker_build_installation.sh; php ./worker.php config.php; done
    #+END_SRC
 
-** Demo container
+** DONE Demo container
+   CLOSED: [2015-03-13 Fr 14:22]
+   - State "DONE"       from ""           [2015-03-13 Fr 14:22]
    We start from the tbro_apache image
    #+BEGIN_SRC sh :tangle ../docker/demo_container/Dockerfile
 FROM tbroteam/tbro_apache
@@ -898,7 +906,9 @@ RUN git clone https://github.com/TBroTeam/DemoData /home/tbro/DemoData
 CMD cd /home/tbro; ./build_installation.sh; cd /home/tbro/DemoData/canabis_sativa_demo/; bash ./import_demo_data.sh;
    #+END_SRC
 
-** WorkerFTP container
+** DONE WorkerFTP container
+   CLOSED: [2015-03-13 Fr 14:22]
+   - State "DONE"       from ""           [2015-03-13 Fr 14:22]
    We start from the generic ubuntu image
    #+BEGIN_SRC sh :tangle ../docker/worker_ftp_container/Dockerfile
 FROM ubuntu
