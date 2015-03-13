@@ -1,5 +1,5 @@
-FROM tbro_apache
+FROM tbroteam/tbro_apache
 
-ADD latest_demo-set.tar.gz /home/tbro/demo-set/
+RUN git clone https://github.com/TBroTeam/DemoData /home/tbro/DemoData
 
-CMD cd /home/tbro; ./build_installation.sh; cd demo-set; bash ./import_demo_data.sh;
+CMD cd /home/tbro; ./build_installation.sh; cd /home/tbro/DemoData/canabis_sativa_demo/; bash ./import_demo_data.sh;

@@ -885,33 +885,17 @@ CMD while true; do cd /home/tbro; ./worker_build_installation.sh; php ./worker.p
 ** Demo container
    We start from the tbro_apache image
    #+BEGIN_SRC sh :tangle ../docker/demo_container/Dockerfile
-FROM tbro_apache
+FROM tbroteam/tbro_apache
    #+END_SRC
 
-   Generate a TBro image from the commit tagged latest
-   #+NAME: prepare_demo_set
-   #+BEGIN_SRC makefile :tangle ../docker/demo_container/Makefile
-prepare:
-	git clone https://github.com/TBroTeam/DemoData
-	tar czf $$PWD/latest_demo-set.tar.gz DemoData/cannabis_sativa_demo
-   #+END_SRC
-
-   And copy the demo archive to the image
+   Clone the current TBro DemoData repository from GitHub
    #+BEGIN_SRC sh :tangle ../docker/demo_container/Dockerfile
-ADD latest_demo-set.tar.gz /home/tbro/demo-set/
+RUN git clone https://github.com/TBroTeam/DemoData /home/tbro/DemoData
    #+END_SRC
 
    Finally we start the apache instance
    #+BEGIN_SRC sh :tangle ../docker/demo_container/Dockerfile
-CMD cd /home/tbro; ./build_installation.sh; cd demo-set; bash ./import_demo_data.sh;
-   #+END_SRC
-
-   Creation of the image:
-   #+BEGIN_SRC makefile :tangle ../docker/demo_container/Makefile
-build: prepare
-	docker build --tag tbro_demo .
-run:
-	docker run --rm -i -t --link Worker_DB_4_TBro:WORKER --link Chado_DB_4_TBro:CHADO --name "TBro-Demo" tbro_demo
+CMD cd /home/tbro; ./build_installation.sh; cd /home/tbro/DemoData/canabis_sativa_demo/; bash ./import_demo_data.sh;
    #+END_SRC
 
 ** WorkerFTP container
