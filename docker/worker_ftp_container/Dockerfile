@@ -1,7 +1,6 @@
 FROM ubuntu
 
-RUN apt-get update
-RUN apt-get --assume-yes install \
+RUN apt-get update && apt-get --assume-yes install \
     vsftpd
 
 EXPOSE 21

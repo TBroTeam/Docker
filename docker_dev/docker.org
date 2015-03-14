@@ -835,8 +835,7 @@ FROM ubuntu
 
    First we update our machine and install the required php packages
    #+BEGIN_SRC sh :tangle ../docker/worker_ftp_container/Dockerfile
-RUN apt-get update
-RUN apt-get --assume-yes install \
+RUN apt-get update && apt-get --assume-yes install \
     vsftpd
    #+END_SRC
 
