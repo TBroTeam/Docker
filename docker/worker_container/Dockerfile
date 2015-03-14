@@ -1,15 +1,14 @@
 FROM ubuntu
 
-RUN apt-get update
-RUN apt-get --assume-yes install \
-    php5-cli \
-    php5-pgsql \
-    php5-curl \
-    ncbi-blast+ \
-    wget \
+RUN apt-get update && apt-get --assume-yes install \
     curl \
     ftp \
-    git
+    git \
+    ncbi-blast+ \
+    php5-cli \
+    php5-curl \
+    php5-pgsql \
+    wget
 
 RUN mkdir -p /home/tbro
 RUN cd /tmp && git clone https://github.com/TBroTeam/TBro.git

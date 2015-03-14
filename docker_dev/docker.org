@@ -762,16 +762,15 @@ FROM ubuntu
 
    First we update our machine and install the required php packages
    #+BEGIN_SRC sh :tangle ../docker/worker_container/Dockerfile
-RUN apt-get update
-RUN apt-get --assume-yes install \
-    php5-cli \
-    php5-pgsql \
-    php5-curl \
-    ncbi-blast+ \
-    wget \
+RUN apt-get update && apt-get --assume-yes install \
     curl \
     ftp \
-    git
+    git \
+    ncbi-blast+ \
+    php5-cli \
+    php5-curl \
+    php5-pgsql \
+    wget
    #+END_SRC
 
    Checkout the current worker code and copy it to the /home/tbro folder
