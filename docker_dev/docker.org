@@ -740,10 +740,9 @@ run:
 
    First we update our machine and install the required php packages
    #+BEGIN_SRC sh :tangle ../docker/generic_chado_db_reload_container/Dockerfile
- RUN apt-get update
- RUN apt-get --assume-yes install \
-     postgresql-client-common \
-     postgresql-client-9.3
+RUN apt-get update && apt-get --assume-yes install \
+     postgresql-client \
+     postgresql-client-common
    #+END_SRC
 
    Finally I have to add a user to the database

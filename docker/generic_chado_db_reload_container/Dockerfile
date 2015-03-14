@@ -1,9 +1,8 @@
  FROM ubuntu
 
- RUN apt-get update
- RUN apt-get --assume-yes install \
-     postgresql-client-common \
-     postgresql-client-9.3
+RUN apt-get update && apt-get --assume-yes install \
+     postgresql-client \
+     postgresql-client-common
 
 ADD chado_database_complete.sql.tar.gz /tmp/
 CMD export PGPASSWORD="$CHADO_ENV_DB_PW"; \
