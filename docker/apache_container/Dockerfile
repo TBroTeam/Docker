@@ -1,19 +1,18 @@
 FROM ubuntu
 
-RUN apt-get update
-RUN apt-get --assume-yes install \
+RUN apt-get update && apt-get --assume-yes install \
     apache2 \
+    build-essential \
+    git \
+    memcached \
     php5 \
     php-pear \
-    php5-pgsql \
     php5-curl \
     php5-dev \
-    build-essential \
-    memcached \
     php5-memcache \
-    postgresql-client-common \
-    postgresql-client-9.3 \
-    git
+    php5-pgsql \
+    postgresql-client \
+    postgresql-client-common
 
 RUN pear channel-discover pear.phing.info
 RUN pear install --alldeps phing/phing
