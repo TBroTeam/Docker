@@ -81,7 +81,8 @@ RUN apt-get update && apt-get --assume-yes install \
     php5-memcache \
     php5-pgsql \
     postgresql-client \
-    postgresql-client-common
+    postgresql-client-common \
+    bash-completion
    #+END_SRC
 
    Next we need to install phing

@@ -12,7 +12,8 @@ RUN apt-get update && apt-get --assume-yes install \
     php5-memcache \
     php5-pgsql \
     postgresql-client \
-    postgresql-client-common
+    postgresql-client-common \
+    bash-completion
 
 RUN pear channel-discover pear.phing.info
 RUN pear install --alldeps phing/phing
