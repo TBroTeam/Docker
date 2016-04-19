@@ -15,10 +15,13 @@ RUN apt-get update && apt-get --assume-yes install \
     postgresql-client-common \
     bash-completion
 
-RUN pear channel-discover pear.phing.info
-RUN pear install --alldeps phing/phing
-RUN pear channel-discover pear.propelorm.org
-RUN pear install -a propel/propel_runtime-1.6.8
+RUN curl https://getcomposer.org/download/1.0.1/composer.phar >/usr/bin/composer
+RUN chmod +x /usr/bin/composer
+RUN export PATH=~/.composer/vendor/bin:$PATH
+RUN echo 'export PATH=~/.composer/vendor/bin:$PATH' >>~/.bash_profile
+RUN composer global require phing/phing
+RUN composer global require propel/propel
+
 RUN pear install Log
 RUN pear install Console_CommandLine
 #RUN pear install Console_Table
