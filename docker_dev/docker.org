@@ -150,6 +150,7 @@ queue_db_password = $WORKER_ENV_DB_PW
 srcdir = \${project.basedir}/src
 builddir = /tmp/build/tbro" > /home/tbro/build.properties
 
+source ~/.bash_profile
 cd /home/tbro
 
 # get the config dir from build.properties
