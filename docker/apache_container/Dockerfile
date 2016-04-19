@@ -24,7 +24,7 @@ RUN composer global require propel/propel @dev
 
 RUN pear install Log
 RUN pear install Console_CommandLine
-#RUN pear install Console_Table
+RUN pear install Console_Table
 RUN pear install channel://pear.php.net/Console_ProgressBar-0.5.2beta
 
 RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini

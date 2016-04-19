@@ -99,7 +99,7 @@ RUN composer global require propel/propel @dev
    #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
 RUN pear install Log
 RUN pear install Console_CommandLine
-#RUN pear install Console_Table
+RUN pear install Console_Table
 RUN pear install channel://pear.php.net/Console_ProgressBar-0.5.2beta
    #+END_SRC
 
