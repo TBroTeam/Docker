@@ -92,7 +92,7 @@ RUN chmod +x /usr/bin/composer
 RUN export PATH=~/.composer/vendor/bin:$PATH
 RUN echo 'export PATH=~/.composer/vendor/bin:$PATH' >>~/.bash_profile
 RUN composer global require phing/phing
-RUN composer global require propel/propel
+RUN composer global require propel/propel @dev
    #+END_SRC
 
    Now we have to install php cli helper via pear
