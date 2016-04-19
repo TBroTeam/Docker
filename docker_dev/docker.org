@@ -63,7 +63,7 @@ docker run --rm -i -t --link Worker_DB_4_TBro_official:WORKER --link Worker_FTP_
    CLOSED: [2015-03-13 Fr 14:22]
    - State "DONE"       from ""           [2015-03-13 Fr 14:22]
    We start from the default postgres container
-   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile :padline no
 FROM ubuntu
    #+END_SRC
 
@@ -122,7 +122,7 @@ RUN cp -r /tmp/tbro/* /home/tbro/
 
    Generate a build.properties based on the environmental variables
    given to the container. Therefore we need a script:
-   #+BEGIN_SRC sh :tangle ../docker/apache_container/build_installation.sh :shebang "#!/bin/bash"
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/build_installation.sh :shebang "#!/bin/bash" :padline no
 echo "
 prefix = $PREFIX
 config_dir = \${prefix}/etc/tbro
@@ -177,7 +177,7 @@ fi
 
    If the container is started, I need to change the connection
    parameter to the database containers for chado-db and worker-db:
-   #+BEGIN_SRC sh :tangle ../docker/apache_container/update_installation.sh :shebang "#!/bin/bash"
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/update_installation.sh :shebang "#!/bin/bash" :padline no
 if [ ! -e /home/tbro ]
 then
     echo "No /home/tbro directory found... Exiting!"
@@ -236,7 +236,7 @@ RUN sed -i -f /home/tbro/enable_AllowOverride_Apache2.sed /etc/apache2/apache2.c
 CMD service memcached restart; service apache2 start; /home/tbro/update_installation.sh; while true; do sleep 60; done
    #+END_SRC
 
-    #+BEGIN_SRC sh :tangle ../docker/apache_container/enable_AllowOverride_Apache2.sed
+    #+BEGIN_SRC sh :tangle ../docker/apache_container/enable_AllowOverride_Apache2.sed :padline no
 # find the corresponding entry for Directory
 /<Directory \/var\/www\/>/{
 
@@ -258,7 +258,7 @@ CMD service memcached restart; service apache2 start; /home/tbro/update_installa
 
 ** TODO Installation of Chado database
    - State "TODO"       from ""           [2015-03-13 Fr 14:21]
-   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/generate_db.sh :shebang "#!/bin/bash"
+   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/generate_db.sh :shebang "#!/bin/bash" :padline no
 export CHADO_DB_NAME=${CHADO_ENV_DB_NAME:-chado}
 export CHADO_DB_USERNAME=${CHADO_ENV_DB_USER:-tbro}
 export CHADO_DB_PASSWORD=${CHADO_ENV_DB_PW:-tbro}
@@ -342,7 +342,7 @@ make clean
    #+END_SRC
 
    We start from the default ubuntu container
-   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/Dockerfile
+   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/Dockerfile :padline no
 FROM ubuntu
    #+END_SRC
 
@@ -485,7 +485,7 @@ CMD export HOME=/tmp/; \
 
    Create and run the container
 
-   #+BEGIN_SRC makefile :tangle ../docker/chado_create_container/Makefile
+   #+BEGIN_SRC makefile :tangle ../docker/chado_create_container/Makefile :padline no
 prepare:
 
 build: prepare
@@ -496,7 +496,7 @@ run:
 
 ** TODO Installation of generic Chado database
    - State "TODO"       from ""           [2015-03-13 Fr 14:21]
-   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/generate_db.sh :shebang "#!/bin/bash"
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/generate_db.sh :shebang "#!/bin/bash" :padline no
 export CHADO_DB_NAME=${CHADO_ENV_DB_NAME:-chado}
 export CHADO_DB_USERNAME=${CHADO_ENV_DB_USER:-tbro}
 export CHADO_DB_PASSWORD=${CHADO_ENV_DB_PW:-tbro}
@@ -580,7 +580,7 @@ make clean
    #+END_SRC
 
    We start from the default ubuntu container
-   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile :padline no
 FROM ubuntu
    #+END_SRC
 
@@ -726,7 +726,7 @@ CMD export HOME=/tmp/; \
 
    Create and run the container
 
-   #+BEGIN_SRC makefile :tangle ../docker/generic_chado_create_container/Makefile
+   #+BEGIN_SRC makefile :tangle ../docker/generic_chado_create_container/Makefile :padline no
 prepare:
 
 build: prepare
@@ -741,7 +741,7 @@ run:
    The current Chado DB dump is linked to our docker_dev folder
 
    We start with our generic database container
-   #+BEGIN_SRC sh :tangle ../docker/generic_chado_db_reload_container/Dockerfile
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_db_reload_container/Dockerfile :padline no
  FROM ubuntu
    #+END_SRC
 
@@ -763,7 +763,7 @@ CMD export PGPASSWORD="$CHADO_ENV_DB_PW"; \
    CLOSED: [2015-03-13 Fr 14:22]
    - State "DONE"       from ""           [2015-03-13 Fr 14:22]
    We start from the default ubuntu image
-   #+BEGIN_SRC sh :tangle ../docker/worker_container/Dockerfile
+   #+BEGIN_SRC sh :tangle ../docker/worker_container/Dockerfile :padline no
 FROM ubuntu
    #+END_SRC
 
@@ -789,7 +789,7 @@ RUN cd /tmp/TBro && git checkout master && cp -r src/queue/worker-php/* /home/tb
 
    Generate a build.properties based on the environmental variables
    given to the container. Therefore we need a script:
-   #+BEGIN_SRC sh :tangle ../docker/worker_container/worker_build_installation.sh :shebang "#!/bin/bash"
+   #+BEGIN_SRC sh :tangle ../docker/worker_container/worker_build_installation.sh :shebang "#!/bin/bash" :padline no
 cd /home/tbro
 
 # set the correct connection parameter
@@ -816,7 +816,7 @@ CMD while true; do cd /home/tbro; ./worker_build_installation.sh; php ./worker.p
    CLOSED: [2015-03-13 Fr 14:22]
    - State "DONE"       from ""           [2015-03-13 Fr 14:22]
    We start from the tbro_apache image
-   #+BEGIN_SRC sh :tangle ../docker/demo_container/Dockerfile
+   #+BEGIN_SRC sh :tangle ../docker/demo_container/Dockerfile :padline no
 FROM tbroteam/tbro_apache
    #+END_SRC
 
@@ -834,7 +834,7 @@ CMD cd /home/tbro; ./build_installation.sh; cd /home/tbro/DemoData/cannabis_sati
    CLOSED: [2015-03-13 Fr 14:22]
    - State "DONE"       from ""           [2015-03-13 Fr 14:22]
    We start from the generic ubuntu image
-   #+BEGIN_SRC sh :tangle ../docker/worker_ftp_container/Dockerfile
+   #+BEGIN_SRC sh :tangle ../docker/worker_ftp_container/Dockerfile :padline no
 FROM ubuntu
    #+END_SRC
 
