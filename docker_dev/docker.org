@@ -85,12 +85,18 @@ RUN apt-get update && apt-get --assume-yes install \
     bash-completion
    #+END_SRC
 
-   Next we need to install phing
+   Next we need to install phing and propel via composer
    #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
-RUN pear channel-discover pear.phing.info
-RUN pear install --alldeps phing/phing
-RUN pear channel-discover pear.propelorm.org
-RUN pear install -a propel/propel_runtime-1.6.8
+RUN curl https://getcomposer.org/download/1.0.1/composer.phar >/usr/bin/composer
+RUN chmod +x /usr/bin/composer
+RUN export PATH=~/.composer/vendor/bin:$PATH
+RUN echo 'export PATH=~/.composer/vendor/bin:$PATH' >>~/.bash_profile
+RUN composer global require phing/phing
+RUN composer global require propel/propel
+   #+END_SRC
+
+   Now we have to install php cli helper via pear
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
 RUN pear install Log
 RUN pear install Console_CommandLine
 #RUN pear install Console_Table
