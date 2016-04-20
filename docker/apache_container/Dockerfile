@@ -21,6 +21,7 @@ RUN export PATH=~/.composer/vendor/bin:$PATH
 RUN echo 'export PATH=~/.composer/vendor/bin:$PATH' >>~/.bash_profile
 RUN composer global require phing/phing
 RUN composer global require "propel/propel1" "~1.6"
+RUN ln -s /root/.composer/vendor/propel/propel1/runtime/lib /usr/share/php/propel
 
 RUN pear install Log
 RUN pear install Console_CommandLine
