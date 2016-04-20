@@ -744,7 +744,7 @@ run:
 
    We start with our generic database container
    #+BEGIN_SRC sh :tangle ../docker/generic_chado_db_reload_container/Dockerfile :padline no
- FROM ubuntu
+FROM ubuntu:trusty
    #+END_SRC
 
    First we update our machine and install the required php packages
