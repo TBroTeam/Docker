@@ -64,7 +64,7 @@ docker run --rm -i -t --link Worker_DB_4_TBro_official:WORKER --link Worker_FTP_
    - State "DONE"       from ""           [2015-03-13 Fr 14:22]
    We start from the default postgres container
    #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile :padline no
-FROM ubuntu
+FROM ubuntu:trusty
    #+END_SRC
 
    First we update our machine and install the required php packages
@@ -345,7 +345,7 @@ make clean
 
    We start from the default ubuntu container
    #+BEGIN_SRC sh :tangle ../docker/chado_create_container/Dockerfile :padline no
-FROM ubuntu
+FROM ubuntu:trusty
    #+END_SRC
 
    #+BEGIN_SRC sh :tangle ../docker/chado_create_container/Dockerfile
@@ -583,7 +583,7 @@ make clean
 
    We start from the default ubuntu container
    #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile :padline no
-FROM ubuntu
+FROM ubuntu:trusty
    #+END_SRC
 
    #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile
@@ -744,7 +744,7 @@ run:
 
    We start with our generic database container
    #+BEGIN_SRC sh :tangle ../docker/generic_chado_db_reload_container/Dockerfile :padline no
- FROM ubuntu
+FROM ubuntu:trusty
    #+END_SRC
 
    First we update our machine and install the required php packages

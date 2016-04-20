@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:trusty
 
 RUN apt-get update
 RUN apt-get --assume-yes install \
