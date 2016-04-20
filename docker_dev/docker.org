@@ -583,7 +583,7 @@ make clean
 
    We start from the default ubuntu container
    #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile :padline no
-FROM ubuntu
+FROM ubuntu:trusty
    #+END_SRC
 
    #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile
