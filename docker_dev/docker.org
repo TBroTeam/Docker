@@ -1,0 +1,1152 @@
+#+TODO: TODO(t!) INPG(i@/!) TEST(n@/!) TESTFAIL(f@/!) TESTPASS(p@/!) | DONE(d!) REJC(c@)
+
+* Installation for TBro using Docker containers
+
+** General structure
+   The Docker installation is separated into several independent containers:
+   1) Database container (based on a generic Postgres database container)
+      - CHADO database scheme plus modifications
+      - AdminTools
+   2) TBro Website
+      - Apache2
+      - php settings...
+   3) memcached container
+      Maybe better included into TBro website container
+   4) Worker container
+
+** DONE Setup procedure
+   CLOSED: [2015-03-13 Fr 14:22]
+   - State "DONE"       from ""           [2015-03-13 Fr 14:22]
+   Start the containers:
+   #+NAME: run_all_container
+   #+BEGIN_SRC sh :results output silent :dir /sudo::/tmp/tbro_docker/
+# we need the database container
+docker pull greatfireball/generic_postgresql_db
+docker pull tbroteam/generic_chado_db_reload
+docker pull tbroteam/tbro_worker_ftp
+docker pull tbroteam/tbro_worker
+docker pull tbroteam/tbro_apache
+docker pull tbroteam/tbro_demo
+
+docker run -d -e DB_NAME=chado -e DB_USER=tbro -e DB_PW=tbro --name "Chado_DB_4_TBro_official" greatfireball/generic_postgresql_db
+sleep 60
+docker run --rm -i -t --link Chado_DB_4_TBro_official:CHADO --name "Chado_DB_4_TBro_load_official" tbroteam/generic_chado_db_reload
+docker run -d -e DB_NAME=worker -e DB_USER=worker -e DB_PW=worker --name "Worker_DB_4_TBro_official" greatfireball/generic_postgresql_db
+
+# run the tbro chado create container
+#docker run -i -t --rm --link Chado_DB_4_TBro:CHADO --name "TBro_CHADO" tbro_chado_generate 2> run_chado_generate.err > run_chado_generate.log
+
+# run the tbro generic chado create container
+#docker run -i -t --link Chado_DB_4_TBro:CHADO --name "Generic_CHADO" tbro_generic_chado_generate
+
+# run the tbro worker FTP container
+docker run -d --name "Worker_FTP_4_TBro_official" -e FTP_USER="tbro" -e FTP_PW="ftp" tbroteam/tbro_worker_ftp
+
+# run the tbro worker container
+docker run -d --link Worker_DB_4_TBro_official:WORKER --link Worker_FTP_4_TBro_official:WORKERFTP --name "TBro_Worker_official" tbroteam/tbro_worker
+docker exec -i -t TBro_Worker_official /home/tbro/worker_build_installation.sh 2> run_worker_build_installation.err > run_worker_build_installation.log
+
+# run the tbro apache container
+docker run -d --link Chado_DB_4_TBro_official:CHADO --link Worker_FTP_4_TBro_official:WORKERFTP --link Worker_DB_4_TBro_official:WORKER --name "TBro_official" -p 80:80 tbroteam/tbro_apache
+# and run the build_installation command in the TBro container
+docker exec -i -t TBro_official /home/tbro/build_installation.sh 2> tbro_build_installation.err > tbro_build_installation.log
+   #+END_SRC
+
+   If required a demo installation can be performed by running:
+   #+NAME: prepare_demo
+   #+BEGIN_SRC sh :dir /sudo::/tmp/tbro_docker/
+# run the tbro demo container
+docker run --rm -i -t --link Worker_DB_4_TBro_official:WORKER --link Worker_FTP_4_TBro_official:WORKERFTP --link Chado_DB_4_TBro_official:CHADO --name "TBro_Demo_official" tbroteam/tbro_demo
+   #+END_SRC
+
+** DONE Apache container
+   CLOSED: [2015-03-13 Fr 14:22]
+   - State "DONE"       from ""           [2015-03-13 Fr 14:22]
+   We start from the default postgres container
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile :padline no
+FROM ubuntu:trusty
+   #+END_SRC
+
+   First we update our machine and install the required php packages
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
+RUN apt-get update && apt-get --assume-yes install \
+    apache2 \
+    build-essential \
+    git \
+    memcached \
+    php5 \
+    php-pear \
+    php5-curl \
+    php5-dev \
+    php5-memcache \
+    php5-pgsql \
+    postgresql-client \
+    postgresql-client-common \
+    bash-completion
+   #+END_SRC
+
+   Next we need to install phing and propel via composer
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
+RUN curl https://getcomposer.org/download/1.0.1/composer.phar >/usr/bin/composer
+RUN chmod +x /usr/bin/composer
+RUN export PATH=~/.composer/vendor/bin:$PATH
+RUN echo 'export PATH=~/.composer/vendor/bin:$PATH' >>~/.bash_profile
+RUN composer global require phing/phing
+RUN composer global require "propel/propel1" "1.6.8"
+RUN ln -s /root/.composer/vendor/propel/propel1/runtime/lib /usr/share/php/propel
+   #+END_SRC
+
+   Now we have to install php cli helper via pear
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
+RUN pear install Log
+RUN pear install Console_CommandLine
+RUN pear install Console_Table
+RUN pear install channel://pear.php.net/Console_ProgressBar-0.5.2beta
+   #+END_SRC
+
+   Modify php.ini to diable phar.readonly
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
+RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini
+   #+END_SRC
+
+   We have to enable mod_rewrite
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
+RUN a2enmod rewrite
+   #+END_SRC
+
+   Clone the current TBro repository from GitHub and copy the content of the master branch to /home/tbro
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
+RUN git clone --recursive https://github.com/TBroTeam/TBro.git /tmp/tbro && cd /tmp/tbro && git checkout master
+RUN mkdir -p /home/tbro/
+RUN cp -r /tmp/tbro/* /home/tbro/
+   #+END_SRC
+
+   Generate a build.properties based on the environmental variables
+   given to the container. Therefore we need a script:
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/build_installation.sh :shebang "#!/bin/bash" :padline no
+echo "
+prefix = $PREFIX
+config_dir = \${prefix}/etc/tbro
+bin_dir = \${prefix}/bin
+www_root = \${prefix}/var/www/html
+share_path = \${prefix}/share/tbro
+var_path = \${prefix}/var/tbro
+autocomplete_path = /etc/bash_completion.d
+www_user = www-data
+www_group = www-data
+www_mode = 0777
+
+chado_db_host = $CHADO_PORT_5432_TCP_ADDR
+chado_db_name = $CHADO_ENV_DB_NAME
+chado_db_port = $CHADO_PORT_5432_TCP_PORT
+chado_db_username = $CHADO_ENV_DB_USER
+chado_db_password = $CHADO_ENV_DB_PW
+
+queue_db_host = $WORKER_PORT_5432_TCP_ADDR
+queue_db_name = $WORKER_ENV_DB_NAME
+queue_db_port = $WORKER_PORT_5432_TCP_PORT
+queue_db_username = $WORKER_ENV_DB_USER
+queue_db_password = $WORKER_ENV_DB_PW
+
+srcdir = \${project.basedir}/src
+builddir = /tmp/build/tbro" > /home/tbro/build.properties
+
+source ~/.bash_profile
+cd /home/tbro
+
+# get the config dir from build.properties
+eval $(grep "prefix =" build.properties | tr -d " ")
+eval $(grep "config_dir =" build.properties | tr -d " ")
+eval $(grep "www_root =" build.properties | tr -d " ")
+
+phing database-initialize
+
+# rename config.php.generated cvterms.php.generated
+mv $config_dir/config.php.generated $config_dir/config.php
+mv $config_dir/cvterms.php.generated $config_dir/cvterms.php
+
+phing database-commit-modifications
+
+phing cli-install
+phing web-install
+phing queue-install-db
+
+if [ -e $www_root/index.html ]
+then
+    rm $www_root/index.html
+fi
+   #+END_SRC
+
+   If the container is started, I need to change the connection
+   parameter to the database containers for chado-db and worker-db:
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/update_installation.sh :shebang "#!/bin/bash" :padline no
+if [ ! -e /home/tbro ]
+then
+    echo "No /home/tbro directory found... Exiting!"
+    exit
+fi
+
+cd /home/tbro
+
+# check if the build.properties are existing, otherwise we are done
+if [ ! -e build.properties ]
+then
+    echo "No build.properties found... Exiting!"
+    exit
+fi
+
+# load the build.properties
+eval $(grep "prefix =" build.properties | tr -d " ")
+eval $(grep "config_dir =" build.properties | tr -d " ")
+
+# check if the file $config_dir/config.php exists, otherwise exit
+if [ ! -e $config_dir/config.php ]
+then
+    echo "No $config_dir/config.php found... Exiting!"
+    exit
+fi
+
+# finally use the values from environmental variables to update
+# database connection parameters
+echo "s/\(^define('DB_CONNSTR', 'pgsql:host=\).*\(;dbname=\).*\(;port=\).*\(');\).*/\1"$CHADO_PORT_5432_TCP_ADDR"\2"$CHADO_ENV_DB_NAME"\3"$CHADO_PORT_5432_TCP_PORT"\4/;
+     s/\(^define('DB_USERNAME', '\).*\(');\)/\1"$CHADO_ENV_DB_USER"\2/;
+     s/\(^define('DB_PASSWORD', '\).*\(');\)/\1"$CHADO_ENV_DB_PW"\2/;
+     s/\(^define('QUEUE_DB_CONNSTR', 'pgsql:host=\).*\(;dbname=\).*\(;port=\).*\(');\).*/\1"$WORKER_PORT_5432_TCP_ADDR"\2"$WORKER_ENV_DB_NAME"\3"$WORKER_PORT_5432_TCP_PORT"\4/;
+     s/\(^define('QUEUE_DB_USERNAME', '\).*\(');\)/\1"$WORKER_ENV_DB_USER"\2/;
+     s/\(^define('QUEUE_DB_PASSWORD', '\).*\(');\)/\1"$WORKER_ENV_DB_PW"\2/;" > update_config.sed
+
+sed -i -f update_config.sed $config_dir/config.php
+
+# Finally I have to restart the apache
+service apache2 restart
+   #+END_SRC
+
+   And add this script to our image
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
+ADD build_installation.sh /home/tbro/
+ADD update_installation.sh /home/tbro/
+ADD enable_AllowOverride_Apache2.sed /home/tbro/
+   #+END_SRC
+
+   Run the AllowOverride_Apache2.sed script to enable overwrite all
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
+RUN sed -i -f /home/tbro/enable_AllowOverride_Apache2.sed /etc/apache2/apache2.conf
+   #+END_SRC
+
+   Finally we start the apache instance
+   #+BEGIN_SRC sh :tangle ../docker/apache_container/Dockerfile
+CMD service memcached restart; service apache2 start; /home/tbro/update_installation.sh; while true; do sleep 60; done
+   #+END_SRC
+
+    #+BEGIN_SRC sh :tangle ../docker/apache_container/enable_AllowOverride_Apache2.sed :padline no
+# find the corresponding entry for Directory
+/<Directory \/var\/www\/>/{
+
+    # set a label get_next_line
+    :get_next_line
+
+    N
+
+    # does the block contain a whole Directory block?
+    s/<\/Directory>/<\/Directory>/
+
+    # if no, jump to get_next_line
+    T get_next_line
+    # else substitute the AllowOverride option
+    s/\(^.*AllowOverride \)[^\n]*/\1 All/
+
+}
+    #+END_SRC
+
+** TODO Installation of Chado database
+   - State "TODO"       from ""           [2015-03-13 Fr 14:21]
+   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/generate_db.sh :shebang "#!/bin/bash" :padline no
+export CHADO_DB_NAME=${CHADO_ENV_DB_NAME:-chado}
+export CHADO_DB_USERNAME=${CHADO_ENV_DB_USER:-tbro}
+export CHADO_DB_PASSWORD=${CHADO_ENV_DB_PW:-tbro}
+export CHADO_DB_HOST=${CHADO_PORT_5432_TCP_ADDR:-localhost}
+export CHADO_DB_PORT=${CHADO_PORT_5432_TCP_PORT:-5432}
+
+# download chado package
+date +"[%Y-%m-%d %H:%M:%S] Starting download of chado package..."
+wget -O /tmp/chado-1.2.tar.gz 'http://downloads.sourceforge.net/project/gmod/gmod/chado-1.2/chado-1.2.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fgmod%2Ffiles%2Fgmod%2Fchado-1.2%2F&ts=1415403627&use_mirror=kent'
+date +"[%Y-%m-%d %H:%M:%S] Finished download of chado package!"
+
+# Follow the instructions of Lenz to generate an adapted version of chado
+# untar the chado archive
+date +"[%Y-%m-%d %H:%M:%S] Starting preparation of chado package..."
+cd /tmp/
+tar xzf chado-1.2.tar.gz
+
+# change to newly created folder
+cd chado-1.2
+
+# follow the instructions of Lenz:
+cd modules
+perl bin/makedep.pl --modules general,cv,pub,organism,sequence,contact,companalysis,mage > default_schema.sql
+date +"[%Y-%m-%d %H:%M:%S] Finished preparation of chado package!"
+
+date +"[%Y-%m-%d %H:%M:%S] Started preparation of GO 1.2..."
+cd /tmp
+
+wget -O gene_ontology.1_2.obo 'http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo'
+
+# convertion into xml format this might need the installation of
+# additional packages and should be moved into the chade database
+# generation later
+go2fmt -p obo_text -w xml gene_ontology.1_2.obo | go-apply-xslt oboxml_to_chadoxml - > g_o.1_2.chadoxml
+date +"[%Y-%m-%d %H:%M:%S] Finished preparation of GO 1.2!"
+
+
+mkdir -p /usr/local/gmod
+export GMOD_ROOT=/usr/local/gmod
+
+cd /tmp/chado-1.2/
+
+# remove old build.conf if existing
+if [ -e build.conf ]
+then
+    rm build.conf
+fi
+
+# run the Makefile.PL generator
+echo "" | perl Makefile.PL
+
+# the installation name for stag-storenode does not end by an .pl
+# to circumstand the wrong name I am generating links with the expected names
+ln -s $(which stag-storenode) $(dirname $(which stag-storenode))/stag-storenode.pl
+ln -s $(which go2fmt) $(dirname $(which go2fmt))/go2fmt.pl
+
+
+# run the make commands
+make
+make install
+make load_schema
+make prepdb
+
+# install the prepared GO 1.2
+date +"[%Y-%m-%d %H:%M:%S] Starting import of own GO 1.2"
+stag-storenode.pl \
+    -d 'dbi:Pg:dbname='$CHADO_DB_NAME';host='$CHADO_DB_HOST';port='$CHADO_DB_PORT \
+    --user "$CHADO_DB_USERNAME" \
+    --password "$CHADO_DB_PASSWORD" \
+    ../g_o.1_2.chadoxml
+date +"[%Y-%m-%d %H:%M:%S] Finished import of own GO 1.2"
+
+# importing the function ontology as last ontology
+make ontologies <<EOF
+1,2,4
+EOF
+
+# make the optional targets
+make rm_locks
+make clean
+   #+END_SRC
+
+   We start from the default ubuntu container
+   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/Dockerfile :padline no
+FROM ubuntu:trusty
+   #+END_SRC
+
+   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/Dockerfile
+RUN apt-get update
+RUN apt-get --assume-yes install \
+    php5-cli \
+    php-pear \
+    php5-pgsql \
+    php5-curl \
+    php5-dev \
+    build-essential
+   #+END_SRC
+
+   Next we need to install phing
+   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/Dockerfile
+RUN pear channel-discover pear.phing.info
+RUN pear install --alldeps phing/phing
+RUN pear channel-discover pear.propelorm.org
+RUN pear install -a propel/propel_runtime
+RUN pear install Log
+RUN pear install Console_CommandLine
+#RUN pear install Console_Table
+RUN pear install channel://pear.php.net/Console_ProgressBar-0.5.2beta
+   #+END_SRC
+
+   Modify php.ini to diable phar.readonly
+   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/Dockerfile
+RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini
+   #+END_SRC
+
+   The Chado installation instruction give the following modules as required for the installation:
+   | module name              | description                | via package manager            |
+   |--------------------------+----------------------------+--------------------------------|
+   | URI::Escape              |                            |                                |
+   | Pod::Usage               |                            |                                |
+   | Config::General          |                            |                                |
+   | DBI                      | gbrowse, chado             | libdbi-perl                    |
+   | DBD::Pg                  | gbrowse, chado             | libdbd-pg-perl                 |
+   | Digest::MD5              |                            |                                |
+   | Module::Build            | chado (installation only)  | libmodule-build-perl           |
+   | Class::DBI               | chado                      | libclass-dbi-perl              |
+   | Class::DBI::Pg           | chado                      | libclass-dbi-pg-perl           |
+   | Class::DBI::Pager        | chado                      | libclass-dbi-pager-perl        |
+   | Class::DBI::View         | chado                      |                                |
+   | XML::Simple              | chado (installation only?) | libxml-simple-perl             |
+   | LWP                      | chado (installation only)  |                                |
+   | Template                 | chado                      | libtemplate-perl               |
+   | Log::Log4perl            | chado                      | liblog-log4perl-perl           |
+   | XML::Parser::PerlSAX     | XORT, Apollo               |                                |
+   | XML::DOM                 | XORT, Apollo               | libxml-dom-perl                |
+   | File::Path               |                            |                                |
+   | Text::Tabs               |                            |                                |
+   | File::Spec               |                            |                                |
+   | XML::Writer              | SOI                        | libxml-writer-perl             |
+   | Graph                    | Chaos                      | libgraph-perl                  |
+   | DBIx::DBStag             | chado, ontology loader     | libdbix-dbstag-perl            |
+   | GO::Parser               | chado, ontology loader     |                                |
+   | XML::LibXSLT             | chaos                      | libxml-libxslt-perl            |
+   | Ima::DBI                 | SGN ontology loader        | libima-dbi-perl                |
+   | Class::MethodMaker       | SGN ontology loader        | libclass-methodmaker-perl      |
+   | URI                      | SGN ontology loader        | liburi-perl                    |
+   | LWP::Simple              | SGN ontology loader        |                                |
+   | XML::Twig                | SGN ontology loader        | libxml-twig-perl               |
+   | Tie::UrlEncoder          | SGN ontology loader        |                                |
+   | HTML::TreeBuilder        | SGN ontology loader        |                                |
+   | Time::HiRes              | SGN ontology loader        |                                |
+   | File::NFSLock            | SGN ontology loader        | libfile-nfslock-perl           |
+   | Class::Data::Inheritable | SGN ontology loader        | libclass-data-inheritable-perl |
+   | IO::Dir                  | chado install util         |                                |
+   | Text::Wrap               | snp2gff?                   |                                |
+
+   Install required perl modules
+   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/Dockerfile
+RUN apt-get install --assume-yes \
+    libdbi-perl \
+    libdbd-pg-perl \
+    libmodule-build-perl \
+    libclass-dbi-perl \
+    libclass-dbi-pg-perl \
+    libclass-dbi-pager-perl \
+    libxml-simple-perl \
+    libtemplate-perl \
+    liblog-log4perl-perl \
+    libxml-dom-perl \
+    libxml-writer-perl \
+    libgraph-perl \
+    libdbix-dbstag-perl \
+    libxml-libxslt-perl \
+    libima-dbi-perl \
+    libclass-methodmaker-perl \
+    liburi-perl \
+    libxml-twig-perl \
+    libfile-nfslock-perl \
+    libclass-data-inheritable-perl \
+    xsltproc \
+    postgresql-server-dev-all \
+    postgresql-client-9.3 \
+    libgo-perl \
+    wget
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install SQL::Translator'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install URI::Escape'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Pod::Usage'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Config::General'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Digest::MD5'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Class::DBI::View'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install LWP'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install XML::Parser::PerlSAX'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install File::Path'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Text::Tabs'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install File::Spec'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install GO::Parser'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install LWP::Simple'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Tie::UrlEncoder'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install HTML::TreeBuilder'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Time::HiRes'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install IO::Dir'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Text::Wrap'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install DBD::Pg'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install GO::Utils'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Bio::Root::Version'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Bio::Chado::Schema'
+   #+END_SRC
+
+   Additionally, I want to have the script for database-Installation in my image
+   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/Dockerfile
+ADD generate_db.sh /tmp/
+   #+END_SRC
+
+   As CMD we would like to run the generate.sh script. First, we set
+   the HOME env var, followed by the creation of a .pgpass file in our
+   home directory. Finally we have to call generate.sh... That's all :)
+   #+BEGIN_SRC sh :tangle ../docker/chado_create_container/Dockerfile
+CMD export HOME=/tmp/; \
+    echo "$CHADO_PORT_5432_TCP_ADDR:$CHADO_PORT_5432_TCP_PORT:$CHADO_ENV_DB_NAME:$CHADO_ENV_DB_USER:$CHADO_ENV_DB_PW" > $HOME/.pgpass; \
+    chmod 600 $HOME/.pgpass; \
+    export PGPASSWORD="$CHADO_ENV_DB_PW"; \
+    $HOME/generate_db.sh
+   #+END_SRC
+
+   Create and run the container
+
+   #+BEGIN_SRC makefile :tangle ../docker/chado_create_container/Makefile :padline no
+prepare:
+
+build: prepare
+	docker build --tag tbro_chado_generate .
+run:
+	docker run -i -t --rm --link Chado_DB_4_TBro:CHADO --name "TBro_CHADO" tbro_chado_generate
+   #+END_SRC
+
+** TODO Installation of generic Chado database
+   - State "TODO"       from ""           [2015-03-13 Fr 14:21]
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/generate_db.sh :shebang "#!/bin/bash" :padline no
+export CHADO_DB_NAME=${CHADO_ENV_DB_NAME:-chado}
+export CHADO_DB_USERNAME=${CHADO_ENV_DB_USER:-tbro}
+export CHADO_DB_PASSWORD=${CHADO_ENV_DB_PW:-tbro}
+export CHADO_DB_HOST=${CHADO_PORT_5432_TCP_ADDR:-localhost}
+export CHADO_DB_PORT=${CHADO_PORT_5432_TCP_PORT:-5432}
+
+# download chado package
+date +"[%Y-%m-%d %H:%M:%S] Starting download of chado package..."
+wget -O /tmp/chado-1.23.tar.gz 'http://sourceforge.net/projects/gmod/files/gmod/chado-1.23/chado-1.23.tar.gz/download'
+
+cd /tmp/
+tar xzf /tmp/chado-1.23.tar.gz
+
+date +"[%Y-%m-%d %H:%M:%S] Finished download of chado package!"
+
+date +"[%Y-%m-%d %H:%M:%S] Started preparation of GO 1.2..."
+cd /tmp
+
+wget -O gene_ontology.1_2.obo 'http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo'
+
+# convertion into xml format this might need the installation of
+# additional packages and should be moved into the chade database
+# generation later
+go2fmt -p obo_text -w xml gene_ontology.1_2.obo | go-apply-xslt oboxml_to_chadoxml - > g_o.1_2.chadoxml
+date +"[%Y-%m-%d %H:%M:%S] Finished preparation of GO 1.2!"
+
+mkdir -p /usr/local/gmod
+export GMOD_ROOT=/usr/local/gmod
+
+cd /tmp/chado-1.23/
+
+# remove old build.conf if existing
+if [ -e build.conf ]
+then
+    rm build.conf
+fi
+
+# run the Makefile.PL generator
+echo "" | perl Makefile.PL
+
+# the installation name for stag-storenode does not end by an .pl
+# to circumstand the wrong name I am generating links with the expected names
+ln -s $(which stag-storenode) $(dirname $(which stag-storenode))/stag-storenode.pl
+ln -s $(which go2fmt) $(dirname $(which go2fmt))/go2fmt.pl
+
+
+# run the make commands
+make
+make install
+make load_schema
+make prepdb
+
+# importing the function ontology as last ontology
+make ontologies <<EOF
+1,2,4,5
+EOF
+
+# install the prepared GO 1.2
+date +"[%Y-%m-%d %H:%M:%S] Starting import of own GO 1.2"
+stag-storenode.pl \
+    -d 'dbi:Pg:dbname='$CHADO_DB_NAME';host='$CHADO_DB_HOST';port='$CHADO_DB_PORT \
+    --user "$CHADO_DB_USERNAME" \
+    --password "$CHADO_DB_PASSWORD" \
+    ../g_o.1_2.chadoxml
+
+if [ $? -ne 0 ]
+then
+    date +"[%Y-%m-%d %H:%M:%S] Import of GO 1.2 failed, retrying"
+    stag-storenode.pl \
+        -d 'dbi:Pg:dbname='$CHADO_DB_NAME';host='$CHADO_DB_HOST';port='$CHADO_DB_PORT \
+        --user "$CHADO_DB_USERNAME" \
+        --password "$CHADO_DB_PASSWORD" \
+        ../g_o.1_2.chadoxml
+
+fi
+date +"[%Y-%m-%d %H:%M:%S] Finished import of own GO 1.2"
+
+# make the optional targets
+make rm_locks
+make clean
+   #+END_SRC
+
+   We start from the default ubuntu container
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile :padline no
+FROM ubuntu:trusty
+   #+END_SRC
+
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile
+RUN apt-get update
+RUN apt-get --assume-yes install \
+    php5-cli \
+    php-pear \
+    php5-pgsql \
+    php5-curl \
+    php5-dev \
+    build-essential
+   #+END_SRC
+
+   Next we need to install phing
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile
+RUN pear channel-discover pear.phing.info
+RUN pear install --alldeps phing/phing
+RUN pear channel-discover pear.propelorm.org
+RUN pear install -a propel/propel_runtime
+RUN pear install Log
+RUN pear install Console_CommandLine
+#RUN pear install Console_Table
+RUN pear install channel://pear.php.net/Console_ProgressBar-0.5.2beta
+   #+END_SRC
+
+   Modify php.ini to diable phar.readonly
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile
+RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini
+   #+END_SRC
+
+   The Chado installation instruction give the following modules as required for the installation:
+   | module name              | description                | via package manager            |
+   |--------------------------+----------------------------+--------------------------------|
+   | URI::Escape              |                            |                                |
+   | Pod::Usage               |                            |                                |
+   | Config::General          |                            |                                |
+   | DBI                      | gbrowse, chado             | libdbi-perl                    |
+   | DBD::Pg                  | gbrowse, chado             | libdbd-pg-perl                 |
+   | Digest::MD5              |                            |                                |
+   | Module::Build            | chado (installation only)  | libmodule-build-perl           |
+   | Class::DBI               | chado                      | libclass-dbi-perl              |
+   | Class::DBI::Pg           | chado                      | libclass-dbi-pg-perl           |
+   | Class::DBI::Pager        | chado                      | libclass-dbi-pager-perl        |
+   | Class::DBI::View         | chado                      |                                |
+   | XML::Simple              | chado (installation only?) | libxml-simple-perl             |
+   | LWP                      | chado (installation only)  |                                |
+   | Template                 | chado                      | libtemplate-perl               |
+   | Log::Log4perl            | chado                      | liblog-log4perl-perl           |
+   | XML::Parser::PerlSAX     | XORT, Apollo               |                                |
+   | XML::DOM                 | XORT, Apollo               | libxml-dom-perl                |
+   | File::Path               |                            |                                |
+   | Text::Tabs               |                            |                                |
+   | File::Spec               |                            |                                |
+   | XML::Writer              | SOI                        | libxml-writer-perl             |
+   | Graph                    | Chaos                      | libgraph-perl                  |
+   | DBIx::DBStag             | chado, ontology loader     | libdbix-dbstag-perl            |
+   | GO::Parser               | chado, ontology loader     |                                |
+   | XML::LibXSLT             | chaos                      | libxml-libxslt-perl            |
+   | Ima::DBI                 | SGN ontology loader        | libima-dbi-perl                |
+   | Class::MethodMaker       | SGN ontology loader        | libclass-methodmaker-perl      |
+   | URI                      | SGN ontology loader        | liburi-perl                    |
+   | LWP::Simple              | SGN ontology loader        |                                |
+   | XML::Twig                | SGN ontology loader        | libxml-twig-perl               |
+   | Tie::UrlEncoder          | SGN ontology loader        |                                |
+   | HTML::TreeBuilder        | SGN ontology loader        |                                |
+   | Time::HiRes              | SGN ontology loader        |                                |
+   | File::NFSLock            | SGN ontology loader        | libfile-nfslock-perl           |
+   | Class::Data::Inheritable | SGN ontology loader        | libclass-data-inheritable-perl |
+   | IO::Dir                  | chado install util         |                                |
+   | Text::Wrap               | snp2gff?                   |                                |
+
+   Install required perl modules
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile
+RUN apt-get install --assume-yes \
+    libdbi-perl \
+    libdbd-pg-perl \
+    libmodule-build-perl \
+    libclass-dbi-perl \
+    libclass-dbi-pg-perl \
+    libclass-dbi-pager-perl \
+    libxml-simple-perl \
+    libtemplate-perl \
+    liblog-log4perl-perl \
+    libxml-dom-perl \
+    libxml-writer-perl \
+    libgraph-perl \
+    libdbix-dbstag-perl \
+    libxml-libxslt-perl \
+    libima-dbi-perl \
+    libclass-methodmaker-perl \
+    liburi-perl \
+    libxml-twig-perl \
+    libfile-nfslock-perl \
+    libclass-data-inheritable-perl \
+    xsltproc \
+    postgresql-server-dev-all \
+    postgresql-client-9.3 \
+    libgo-perl \
+    pbzip2 \
+    wget
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install SQL::Translator'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install URI::Escape'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Pod::Usage'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Config::General'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Digest::MD5'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Class::DBI::View'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install LWP'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install XML::Parser::PerlSAX'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install File::Path'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Text::Tabs'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install File::Spec'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install GO::Parser'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install LWP::Simple'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Tie::UrlEncoder'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install HTML::TreeBuilder'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Time::HiRes'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install IO::Dir'
+#RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Text::Wrap'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install DBD::Pg'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install GO::Utils'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Bio::Root::Version'
+RUN PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'force install Bio::Chado::Schema'
+   #+END_SRC
+
+   Additionally, I want to have the script for database-Installation in my image
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile
+ADD generate_db.sh /tmp/
+   #+END_SRC
+
+   As CMD we would like to run the generate.sh script. First, we set
+   the HOME env var, followed by the creation of a .pgpass file in our
+   home directory. Finally we have to call generate.sh... That's all :)
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_create_container/Dockerfile
+CMD export HOME=/tmp/; \
+    echo "$CHADO_PORT_5432_TCP_ADDR:$CHADO_PORT_5432_TCP_PORT:$CHADO_ENV_DB_NAME:$CHADO_ENV_DB_USER:$CHADO_ENV_DB_PW" > $HOME/.pgpass; \
+    chmod 600 $HOME/.pgpass; \
+    export PGPASSWORD="$CHADO_ENV_DB_PW"; \
+    $HOME/generate_db.sh; \
+    pg_dump --dbname=$CHADO_ENV_DB_NAME --host=$CHADO_PORT_5432_TCP_ADDR --port=$CHADO_PORT_5432_TCP_PORT --username=$CHADO_ENV_DB_USER | pbzip2 -9 --verbose --stdout --compress > /tmp/generic_chado_1.23.sql.bz2; \
+    while true; do sleep 300; done
+   #+END_SRC
+
+   Create and run the container
+
+   #+BEGIN_SRC makefile :tangle ../docker/generic_chado_create_container/Makefile :padline no
+prepare:
+
+build: prepare
+	docker build --tag tbro_generic_chado_generate .
+run:
+	docker run -i -t --link Chado_DB_4_TBro:CHADO --name "Generic_CHADO" tbro_generic_chado_generate
+   #+END_SRC
+
+** DONE Load chado database image
+   CLOSED: [2015-03-13 Fr 14:21]
+   - State "DONE"       from ""           [2015-03-13 Fr 14:21]
+   The current Chado DB dump is linked to our docker_dev folder
+
+   We start with our generic database container
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_db_reload_container/Dockerfile :padline no
+FROM ubuntu:trusty
+   #+END_SRC
+
+   First we update our machine and install the required php packages
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_db_reload_container/Dockerfile
+RUN apt-get update && apt-get --assume-yes install \
+     postgresql-client \
+     postgresql-client-common
+   #+END_SRC
+
+   Finally I have to add a user to the database
+   #+BEGIN_SRC sh :tangle ../docker/generic_chado_db_reload_container/Dockerfile
+ADD chado_database_complete.sql.tar.gz /tmp/
+CMD export PGPASSWORD="$CHADO_ENV_DB_PW"; \
+    cat /tmp/chado_database_complete.sql | psql --host=$CHADO_PORT_5432_TCP_ADDR --port=$CHADO_PORT_5432_TCP_PORT --username=$CHADO_ENV_DB_USER $CHADO_ENV_DB_NAME
+   #+END_SRC
+
+** DONE Worker container
+   CLOSED: [2015-03-13 Fr 14:22]
+   - State "DONE"       from ""           [2015-03-13 Fr 14:22]
+   We start from the default ubuntu image
+   #+BEGIN_SRC sh :tangle ../docker/worker_container/Dockerfile :padline no
+FROM ubuntu
+   #+END_SRC
+
+   First we update our machine and install the required php packages
+   #+BEGIN_SRC sh :tangle ../docker/worker_container/Dockerfile
+RUN apt-get update && apt-get --assume-yes install \
+    curl \
+    ftp \
+    git \
+    ncbi-blast+ \
+    php5-cli \
+    php5-curl \
+    php5-pgsql \
+    wget
+   #+END_SRC
+
+   Checkout the current worker code and copy it to the /home/tbro folder
+   #+BEGIN_SRC sh :tangle ../docker/worker_container/Dockerfile
+RUN mkdir -p /home/tbro
+RUN cd /tmp && git clone https://github.com/TBroTeam/TBro.git
+RUN cd /tmp/TBro && git checkout master && cp -r src/queue/worker-php/* /home/tbro/
+   #+END_SRC
+
+   Generate a build.properties based on the environmental variables
+   given to the container. Therefore we need a script:
+   #+BEGIN_SRC sh :tangle ../docker/worker_container/worker_build_installation.sh :shebang "#!/bin/bash" :padline no
+cd /home/tbro
+
+# set the correct connection parameter
+sed -i 's/\${queue_db_host}/'WORKER'/' config.php
+sed -i 's/\${queue_db_name}/'$WORKER_ENV_DB_NAME'/' config.php
+sed -i 's/\${queue_db_port}/'$WORKER_PORT_5432_TCP_PORT'/' config.php
+
+# set the correct user parameter
+sed -i 's/\${queue_db_username}/'$WORKER_ENV_DB_USER'/' config.php
+sed -i 's/\${queue_db_password}/'$WORKER_ENV_DB_PW'/' config.php
+   #+END_SRC
+
+   And add this script to our image
+   #+BEGIN_SRC sh :tangle ../docker/worker_container/Dockerfile
+ADD worker_build_installation.sh /home/tbro/
+   #+END_SRC
+
+   Finally we start the apache instance
+   #+BEGIN_SRC sh :tangle ../docker/worker_container/Dockerfile
+CMD while true; do cd /home/tbro; ./worker_build_installation.sh; php ./worker.php config.php; done
+   #+END_SRC
+
+** DONE Demo container
+   CLOSED: [2015-03-13 Fr 14:22]
+   - State "DONE"       from ""           [2015-03-13 Fr 14:22]
+   We start from the tbro_apache image
+   #+BEGIN_SRC sh :tangle ../docker/demo_container/Dockerfile :padline no
+FROM tbroteam/tbro_apache
+   #+END_SRC
+
+   Clone the current TBro DemoData repository from GitHub
+   #+BEGIN_SRC sh :tangle ../docker/demo_container/Dockerfile
+RUN git clone https://github.com/TBroTeam/DemoData /home/tbro/DemoData
+   #+END_SRC
+
+   Finally we start the apache instance
+   #+BEGIN_SRC sh :tangle ../docker/demo_container/Dockerfile
+CMD cd /home/tbro; ./build_installation.sh; cd /home/tbro/DemoData/cannabis_sativa_demo/; bash ./import_demo_data.sh;
+   #+END_SRC
+
+** DONE WorkerFTP container
+   CLOSED: [2015-03-13 Fr 14:22]
+   - State "DONE"       from ""           [2015-03-13 Fr 14:22]
+   We start from the generic ubuntu image
+   #+BEGIN_SRC sh :tangle ../docker/worker_ftp_container/Dockerfile :padline no
+FROM ubuntu
+   #+END_SRC
+
+   First we update our machine and install the required php packages
+   #+BEGIN_SRC sh :tangle ../docker/worker_ftp_container/Dockerfile
+RUN apt-get update && apt-get --assume-yes install \
+    vsftpd
+   #+END_SRC
+
+   Export the FTP port
+   #+BEGIN_SRC sh :tangle ../docker/worker_ftp_container/Dockerfile
+EXPOSE 21
+   #+END_SRC
+
+   Create the empty directory
+   #+BEGIN_SRC sh :tangle ../docker/worker_ftp_container/Dockerfile
+RUN mkdir -p /var/run/vsftpd/empty
+   #+END_SRC
+
+   Setup the config file
+   #+BEGIN_SRC sh :tangle ../docker/worker_ftp_container/Dockerfile
+RUN echo "listen=YES\nanonymous_enable=yes\nlocal_enable=YES\nanon_root=/home/tbro\nlocal_umask=033\nwrite_enable=YES\ndirmessage_enable=YES\nuse_localtime=YES\nxferlog_enable=YES\nconnect_from_port_20=YES\nsecure_chroot_dir=/var/run/vsftpd/empty\npam_service_name=vsftpd\nrsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem\nrsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key" > /etc/vsftpd.conf
+   #+END_SRC
+
+   Finally we start the ftp server on startup
+   #+BEGIN_SRC sh :tangle ../docker/worker_ftp_container/Dockerfile
+CMD export FTP_USER=${FTP_USER:-ftpuser}; export FTP_PW=${FTP_PW:-ftppassword}; adduser "$FTP_USER"; echo "$FTP_USER":"$FTP_PW" | chpasswd; while true; do vsftpd; done
+   #+END_SRC
+
+** Issues
+  #+BEGIN_QUOTE
+  15. Nov. 00:55 - Markus Ankenbrand: Ok ich hab das Funktionen Problem gelöst. War tatsächlich mein Fehler. Hab auch im Docker branch den commit angepasst. Hab beide gepushed. Jetzt klappt auch der import von Sequenz IDs in die DB. Wir haben aber immer noch Probleme:
+                   1. own go bricht mit duplicate value ab.
+                   2. Man muss build_installation.sh zweimal ausführen. Beim ersten mal fehlt manchen noch die config.php (z.B. den bash_completions)
+                   3. Wir haben den propel Version mismatch
+                   4. tbro-db organism list geht nicht.
+                   5. Der TBro findet die Ajax Webservices nicht - mod_rewrite ist aber an, oder?
+                   6. Und das sind nur die Probleme, die ich schon kenne
+                   Gute Nacht
+  15. Nov. 00:59 - Frank Förster: Du sollst schlafen!
+  15. Nov. 00:59 - Frank Förster: :)
+  15. Nov. 00:59 - Frank Förster: Danke für die Analyse
+  15. Nov. 01:00 - Frank Förster: Just one thing...
+  15. Nov. 01:01 - Frank Förster: Wir!sollten die ontologies in der richtigen reihenfolge machen
+  15. Nov. 01:01 - Frank Förster: Wir machen 1, 2 und 4 und anschließend 3
+  15. Nov. 01:01 - Frank Förster: Vielleicht ist es das schon
+  15. Nov. 01:02 - Markus Ankenbrand: Gerne 😃 schau ich mir morgen an. Jetzt geh ich erstmal schlafen
+  15. Nov. 01:09 - Frank Förster: Das mit dem zweimal build_Installation ist auch schon mist. Darf das drin, dass beim ersten mal etwas fehlt?
+  15. Nov. 01:09 - Frank Förster: Ich bin gerade wieder wach geworden
+  15. Nov. 01:09 - Frank Förster: Ich schaue mir den Code nochmal an
+  15. Nov. 01:10 - Frank Förster: Also vergiss nicht neu pullen :)
+  15. Nov. 01:11 - Frank Förster: Mod_rewrite sollte an sein
+  15. Nov. 01:12 - Frank Förster: 4. Punkt macht da Sinn?
+  15. Nov. 01:12 - Frank Förster: das nicht da
+  15. Nov. 01:13 - Frank Förster: Was nehmen wir zum issue tracken? Gleich unsere org file?
+  15. Nov. 01:13 - Frank Förster: Oder redmine?
+  15. Nov. 01:13 - Frank Förster: Email?
+  #+END_QUOTE
+
+*** DONE Update of database connection during start of apache container
+    - State "DONE"       from "TESTPASS"   [2014-11-17 Mo 13:44]
+    - State "TESTPASS"   from "TEST"       [2014-11-17 Mo 13:44] \\
+      Test of database connection after restart passed
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 13:34] \\
+      Wrong variables corrected.
+      Need testing
+    - State "INPG"       from "TESTFAIL"   [2014-11-17 Mo 13:33] \\
+      Working on the issue
+    - State "TESTFAIL"   from "TEST"       [2014-11-17 Mo 13:24] \\
+      Failed with Error!: SQLSTATE[08006] [7] fe_sendauth: no password supplied
+      Due to wrong variable names
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 12:10] \\
+      Modifications included, requires testing
+    - State "INPG"       from "TESTFAIL"   [2014-11-17 Mo 12:05] \\
+      Starting second fixing iteration
+    - State "TESTFAIL"   from "TEST"       [2014-11-17 Mo 11:30] \\
+      Wrong directory checked (/tmp/tbro instead of /home/tbro)
+      sed -if not working (unknown option u)
+    - State "TEST"       from "INPG"       [2014-11-15 Sa 02:24] \\
+      Implementation finished... Test is required
+    - State "INPG"       from "TODO"       [2014-11-14 Fr 17:00] \\
+      Frank started working on the issue
+    - State "TODO"       from ""           [2014-11-14 Fr 16:30]
+*** DONE During TBro installation a more generic appoach for the used commit to checkout
+    - State "DONE"       from "TESTPASS"   [2014-11-17 Mo 13:39]
+    - State "TESTPASS"   from "TEST"       [2014-11-17 Mo 13:39]
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 11:48] \\
+      Finished... Need to get tested now.
+    - State "INPG"       from "TODO"       [2014-11-17 Mo 11:10] \\
+      Frank started to work on this issue
+
+      For a more general approach we need to perform the following steps:
+
+      1) Tag a special commit "latest"
+      2) Use this tag instead of a special SHA1 sum for building the archive
+         during image creation
+      3) Add the new archive to the image
+    - State "TODO"       from ""       [2014-11-15 Sa 01:15]
+*** DONE own go bricht mit duplicate value ab.
+    - State "DONE"       from "TESTPASS"   [2014-11-20 Do 09:53]
+    - State "TESTPASS"   from "TEST"       [2014-11-20 Do 09:52] \\
+      The own go problem was solved by moving it up before make ontologies
+    - State "TEST"       from "INPG"       [2014-11-19 Mi 18:06] \\
+      Added two packages to be installed from cpan!
+
+      Needs testing again!
+    - State "INPG"       from "TESTFAIL"   [2014-11-19 Mi 18:04] \\
+      We have to add two cpan modules to allow the execution of all commands
+    - State "TESTFAIL"   from "TEST"       [2014-11-19 Mi 18:03] \\
+      Failed again!
+    - State "TEST"       from "TESTFAIL"   [2014-11-19 Mi 09:53] \\
+      Moved make ontologies completely below stag-storenode to avoid duplicate key violation
+    - State "TESTFAIL"   from "TEST"       [2014-11-15 Sa 07:49] \\
+      Test failed with duplicate value
+
+      DBD::Pg::st execute failed: ERROR:  duplicate key value violates unique constraint "cvterm_c2"
+      DETAIL:  Key (dbxref_id)=(121) already exists. [for Statement "INSERT INTO cvterm (name, dbxref_id, cv_id, is_relationshiptype) VALUES (?, ?, ?, ?)" with ParamValues: 1='part_of', 2='121', 3='16', 4='1'] at /usr/share/perl5/DBIx/DBStag.pm line 3322.
+      DBD::Pg::st execute failed: ERROR:  duplicate key value violates unique constraint "cvterm_c2"
+      DETAIL:  Key (dbxref_id)=(121) already exists. [for Statement "INSERT INTO cvterm (name, dbxref_id, cv_id, is_relationshiptype) VALUES (?, ?, ?, ?)" with ParamValues: 1='part_of', 2='121', 3='16', 4='1'] at /usr/share/perl5/DBIx/DBStag.pm line 3322.
+    - State "TEST"       from "INPG"       [2014-11-15 Sa 02:11] \\
+      Possible solution have been prepared and need to be tested now
+    - State "INPG"       from "TODO"       [2014-11-15 Sa 01:20] \\
+      Frank started to work on the issue
+    - State "TODO"       from ""       [2014-11-15 Sa 01:15]
+
+      My idea is that this issue might be basing on the order we are
+      executing the ontology import. Normally the import order is given
+      by the make ontologies run. We changed that order due to we first
+      import functions during generate_db.sh script followed by the
+      import of our own GO ontology.
+
+      I changed the order of the ontology import.
+*** DONE Man muss build_installation.sh zweimal ausführen. Beim ersten mal fehlt manchen noch die config.php (z.B. den bash_completions)
+    - State "DONE"       from "TESTPASS"   [2014-11-17 Mo 11:13]
+    - State "TESTPASS"   from "TEST"       [2014-11-17 Mo 11:05]
+    - Note taken on [2014-11-15 Sa 09:04] \\
+      No error while performing build_installation.sh
+
+      Markus has to recheck!
+    - State "TEST"       from "INPG"       [2014-11-15 Sa 03:42] \\
+      Need to be tested
+    - State "INPG"       from "TODO"       [2014-11-15 Sa 03:32] \\
+      Frank started working on the issue
+    - State "TODO"       from ""       [2014-11-15 Sa 01:15]
+
+      I checked the installation guide at Lenz thesis and found the
+      solution. After the initial phing database-initialize command I
+      have to prepare the config files. Therefore I have to reorder
+      the commands in the build_environment.sh script.
+*** DONE Wir haben den propel Version mismatch
+    - State "DONE"       from "TESTPASS"   [2014-11-17 Mo 11:15]
+    - State "TESTPASS"   from "TODO"       [2014-11-17 Mo 11:14] \\
+      Passed test after fixing version to 1.6.8 instead of latest (1.7.1)
+    - State "TODO"       from ""       [2014-11-15 Sa 01:15]
+*** DONE tbro-db organism list geht nicht.
+    - State "DONE"       from "TESTPASS"   [2014-11-17 Mo 11:20]
+    - State "TESTPASS"   from "TODO"       [2014-11-17 Mo 11:19] \\
+      tbro-db organism list problem was solved by resolving the propel version mismatch issue
+    - State "TODO"       from ""       [2014-11-15 Sa 01:15]
+*** DONE Der TBro findet die Ajax Webservices nicht - mod_rewrite ist aber an, oder?
+    - State "DONE"       from "TESTPASS"   [2014-11-17 Mo 11:22]
+    - State "TESTPASS"   from "TEST"       [2014-11-17 Mo 11:21] \\
+      The solution was adding the AllowOverride All directive to the /var/www directory in apache.conf
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 10:54] \\
+      Need to be tested again
+    - State "INPG"       from "TESTFAIL"   [2014-11-17 Mo 10:14] \\
+      Seems to be neccessary to add a slash after the path where to copy the
+      sed script to
+    - State "TESTFAIL"   from "TEST"       [2014-11-17 Mo 10:12] \\
+      Markus tested the modification an got an error complaining about not beeing a directory.
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 10:03] \\
+      Added script. Need to be tested!
+    - State "INPG"       from "TODO"       [2014-11-15 Sa 08:40]
+    - State "TODO"       from ""       [2014-11-15 Sa 01:15]
+    The error is even more genetic as almost all links are broken.
+    The rewrite rules are obviously not applied although mod_rewrite is enabled.
+    The error arises from the apache configuration which by default does not allow .htaccess files to override configuration.
+    This can be solved by adding the following block to /etc/apache2/sites-enabled/000-default.conf:
+    #+BEGIN_QUOTE
+      <Directory /var/www/html>
+        Options FollowSymLinks
+	AllowOverride All
+      </Directory>
+    #+END_QUOTE
+    @Frank: please find a way to automatically include this block or do something equivalent.
+    Should be finished... Switch to test required!
+*** DONE Remove existing index.html from tbro installation directory
+    - State "DONE"       from "TESTPASS"   [2014-11-17 Mo 12:05]
+    - State "TESTPASS"   from "TEST"       [2014-11-17 Mo 12:05] \\
+      removing of index.html resolves the issue
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 11:44]
+    - State "INPG"       from "TODO"       [2014-11-17 Mo 11:40] \\
+      Markus added rm of $www_root/index.html to build_installation.sh
+    - State "TODO"       from ""           [2014-11-15 Sa 09:05]
+*** DONE Add /C. sativa/ demo data and script to import
+    - State "DONE"       from "TESTPASS"   [2014-12-11 Do 10:47]
+    - State "TESTPASS"   from "TEST"       [2014-12-11 Do 10:46] \\
+      Test passed demo data succesfully added to demo container
+    - State "TEST"       from "INPG"       [2014-11-19 Mi 09:54] \\
+      Data and script added for import of all data types
+      (only BLAST, unigenes and synonyms/publication missing)
+    - State "INPG"       from "TODO"       [2014-11-17 Mo 15:34] \\
+      Packed demo data into .tar.gz archive and started to write a import.sh script
+    - State "TODO"       from ""           [2014-11-17 Mo 11:40]
+*** DONE Add functionality to worker_db image to provide blast db files
+    - State "DONE"       from "TESTPASS"   [2014-12-11 Do 10:48]
+    - State "TESTPASS"   from "TEST"       [2014-12-11 Do 10:48] \\
+      Test passed: The worker ftp container provides the required blastdb files via ftp
+    - State "TEST"       from "INPG"       [2014-11-18 Di 16:54] \\
+      Finished implementation... Now the image has to be tested!
+    - State "INPG"       from "TODO"       [2014-11-18 Di 14:11] \\
+      Frank started working on the issue
+
+      I will create a modified worker_db image based on the generic ubuntu
+      image
+    - State "TODO"       from ""           [2014-11-17 Mo 14:07]
+*** DONE Build a blast worker node image
+    - State "DONE"       from "TESTPASS"   [2014-12-17 Mi 14:44]
+    - State "TESTPASS"   from "TEST"       [2014-12-17 Mi 14:44] \\
+      Test passed with static hostname
+    - State "TEST"       from "TESTFAIL"   [2014-12-17 Mi 14:43] \\
+      Changed IP-env variable to static hostname
+    - State "TESTFAIL"   from "TEST"       [2014-12-11 Do 10:49] \\
+      The blast worker container does work in general.
+      However the worker_build_installation.sh does only replace the placeholders in config.php once
+      on the first run. After that the IPs are fixed.
+      Therefore it can not connect to the database after docker stop/start even though it is linked
+      against the queue_db_container.
+      This has to be dynamically changed on each start via worker_build_installation.sh or the hostname
+      which is automaticalli changed in /etc/hosts has to be used.
+    - State "TEST"       from "INPG"       [2014-11-20 Do 16:04] \\
+      Fixed wrong keys from job array which might result from our global rebase
+      Fixed demo-set! Missing escape character $ led to empty db parameter in database, but it is required to be $DBFILE
+
+      Need to be tested again!
+    - State "INPG"       from "TEST"       [2014-11-20 Do 14:55] \\
+      Missing packages curl, ftp, and wget!
+    - State "TEST"       from "INPG"       [2014-11-18 Di 13:56] \\
+      No need to change the hosts file, due to the hostfile already contains
+      an entry for WORKER_DB. We just have to use WORKER as hostname for
+      the downloadfiles
+    - State "INPG"       from "TEST"       [2014-11-17 Mo 18:38] \\
+      Missing adaptation to new Worker_DB via hosts file
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 17:12] \\
+      Added missing package blast to the package list.
+    - State "INPG"       from "TEST"       [2014-11-17 Mo 17:09] \\
+      Found another error... The blast-package is not installed! Add the
+      package to the package list!
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 17:01] \\
+      Issue should be fixed! Tests needed!
+    - State "INPG"       from "TESTFAIL"   [2014-11-17 Mo 16:35] \\
+      Frank restarted working on the issue
+    - State "TESTFAIL"   from "TEST"       [2014-11-17 Mo 16:33] \\
+      Start script is not working! I need to fix the substitution of the
+      variables using the environmental variables.
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 16:25] \\
+      Finished! Needs to be tested!
+    - State "INPG"       from "TODO"       [2014-11-17 Mo 14:00] \\
+      Frank started working on the issue
+    - State "TODO"       from ""           [2014-11-17 Mo 13:47]
+*** DONE In worker_db the database contains no tables
+    - State "DONE"       from "TESTPASS"   [2014-11-18 Di 17:00]
+    - State "TESTPASS"   from "TEST"       [2014-11-18 Di 17:00] \\
+      Test passed after installing postgresql-client packages
+    - State "TEST"       from "INPG"       [2014-11-17 Mo 17:58] \\
+      Install packages postgresql-client-common and postgresql-client-9.3
+      Trying to fix empty worker_db by installing postgresql-client-* packages in apache_image
+    - State "INPG"       from "TODO"       [2014-11-17 Mo 17:25] \\
+      Markus is working on the issue.
+
+      It seems, that the problem is a missing psql on the apache2 image
+    - State "TODO"       from ""           [2014-11-17 Mo 17:06]
+*** DONE Change Demo installation to create worker database on FTP
+    - State "DONE"       from "TESTPASS"   [2014-12-11 Do 10:55]
+    - State "TESTPASS"   from "TEST"       [2014-12-11 Do 10:54] \\
+      Works fine
+    - State "TEST"       from "INPG"       [2014-11-20 Do 16:04] \\
+      Everything is set up.
+
+      Need to be tested!
+    - State "INPG"       from "TODO"       [2014-11-19 Mi 15:49] \\
+      Frank started working on the issue
+    - State "TODO"       from ""           [2014-11-19 Mi 15:35]
+*** TODO In each database container give a possibility to dump database with exec command
+    - State "TODO"       from ""           [2014-11-20 Do 09:57]
+*** DONE Change the ec2kegg mapping commands in demo container
+    - State "DONE"       from "TESTPASS"   [2014-12-11 Do 10:57]
+    - State "TESTPASS"   from "TEST"       [2014-12-11 Do 10:56] \\
+      Works fine
+    - State "TEST"       from "INPG"       [2014-11-20 Do 16:08]
+    - State "INPG"       from "TODO"       [2014-11-20 Do 12:07] \\
+      Markus started to work on the issue
+    - State "TODO"       from ""           [2014-11-20 Do 11:52]
+*** DONE Memcached not running and Zend extension not working in apache_tbro container
+    - State "DONE"       from "TESTPASS"   [2014-12-11 Do 10:58]
+    - State "TESTPASS"   from "TEST"       [2014-12-11 Do 10:58] \\
+      Works
+    - State "TEST"       from "INPG"       [2014-11-20 Do 14:51] \\
+      Added missing package php5-memcache and starting memcached service via
+      CMD command
+
+      Need to be tested now
+    - State "INPG"       from "TODO"       [2014-11-20 Do 14:45] \\
+      Markus and Frank solved the problem...
+      Missing package php5-memcache has to be installed
+    - State "TODO"       from ""           [2014-11-20 Do 11:53]
+*** INPG [0/4] New Chado Database container
+    - State "INPG"       from ""           [2014-11-24 Mo 15:01] \\
+      Markus and Frank are working on the issue
+    - [ ] New chado database container to generate a complete chado db with a complete import of all orthologies
+    - [ ] Instead of default GO use GO 1.2
+    - [ ] Export the created database using pg_dump
+    - [ ] Get the very last chado by parsing the RSS feed
