@@ -20,7 +20,7 @@ RUN chmod +x /usr/bin/composer
 RUN export PATH=~/.composer/vendor/bin:$PATH
 RUN echo 'export PATH=~/.composer/vendor/bin:$PATH' >>~/.bash_profile
 RUN composer global require phing/phing
-RUN composer global require propel/propel @dev
+RUN composer global require "propel/propel1" "~1.6"
 
 RUN pear install Log
 RUN pear install Console_CommandLine
