@@ -2,23 +2,23 @@ FROM ubuntu:trusty
 
 RUN apt-get update
 RUN apt-get --assume-yes install \
-    php5-cli \
-    php-pear \
-    php5-pgsql \
-    php5-curl \
-    php5-dev \
+#    php5-cli \
+#    php-pear \
+#    php5-pgsql \
+#    php5-curl \
+#    php5-dev \
     build-essential
 
-RUN pear channel-discover pear.phing.info
-RUN pear install --alldeps phing/phing
-RUN pear channel-discover pear.propelorm.org
-RUN pear install -a propel/propel_runtime
-RUN pear install Log
-RUN pear install Console_CommandLine
+#RUN pear channel-discover pear.phing.info
+#RUN pear install --alldeps phing/phing
+#RUN pear channel-discover pear.propelorm.org
+#RUN pear install -a propel/propel_runtime
+#RUN pear install Log
+#RUN pear install Console_CommandLine
 #RUN pear install Console_Table
-RUN pear install channel://pear.php.net/Console_ProgressBar-0.5.2beta
+#RUN pear install channel://pear.php.net/Console_ProgressBar-0.5.2beta
 
-RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini
+#RUN sed -i '/phar.readonly = /s/^.*/phar.readonly = Off/' /etc/php5/cli/php.ini
 
 RUN apt-get install --assume-yes \
     libdbi-perl \
