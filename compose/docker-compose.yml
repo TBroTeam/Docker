@@ -1,0 +1,8 @@
+version: '2'
+services:
+  chado:
+    image: greatfireball/generic_postgresql_db
+    environment:
+      DB_USER: tbro
+      DB_PW: tbro
+      DB_NAME: chado
