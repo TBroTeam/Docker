@@ -77,5 +77,5 @@ CMD export HOME=/tmp/; \
     chmod 600 $HOME/.pgpass; \
     export PGPASSWORD="$CHADO_ENV_DB_PW"; \
     $HOME/generate_db.sh; \
-    pg_dump --dbname=$CHADO_ENV_DB_NAME --host=$CHADO_PORT_5432_TCP_ADDR --port=$CHADO_PORT_5432_TCP_PORT --username=$CHADO_ENV_DB_USER | pbzip2 -9 --verbose --stdout --compress > /tmp/generic_chado_1.23.sql.bz2; \
+    pg_dump --dbname=$CHADO_ENV_DB_NAME --host=$CHADO_PORT_5432_TCP_ADDR --port=$CHADO_PORT_5432_TCP_PORT --username=$CHADO_ENV_DB_USER | pbzip2 -9 --verbose --stdout --compress > /tmp/generic_chado_1.31.sql.bz2; \
     while true; do sleep 300; done

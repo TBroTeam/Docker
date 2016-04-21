@@ -7,10 +7,10 @@ export CHADO_DB_PORT=${CHADO_PORT_5432_TCP_PORT:-5432}
 
 # download chado package
 date +"[%Y-%m-%d %H:%M:%S] Starting download of chado package..."
-wget -O /tmp/chado-1.23.tar.gz 'http://sourceforge.net/projects/gmod/files/gmod/chado-1.23/chado-1.23.tar.gz/download'
+wget -O /tmp/chado-1.31.tar.gz 'http://sourceforge.net/projects/gmod/files/gmod/chado-1.31/chado-1.31.tar.gz/download'
 
 cd /tmp/
-tar xzf /tmp/chado-1.23.tar.gz
+tar xzf /tmp/chado-1.31.tar.gz
 
 date +"[%Y-%m-%d %H:%M:%S] Finished download of chado package!"
 
@@ -28,7 +28,7 @@ date +"[%Y-%m-%d %H:%M:%S] Finished preparation of GO 1.2!"
 mkdir -p /usr/local/gmod
 export GMOD_ROOT=/usr/local/gmod
 
-cd /tmp/chado-1.23/
+cd /tmp/chado-1.31/
 
 # remove old build.conf if existing
 if [ -e build.conf ]
