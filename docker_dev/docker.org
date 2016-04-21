@@ -1146,7 +1146,7 @@ CMD export FTP_USER=${FTP_USER:-ftpuser}; export FTP_PW=${FTP_PW:-ftppassword}; 
 *** INPG [0/4] New Chado Database container
     - State "INPG"       from ""           [2014-11-24 Mo 15:01] \\
       Markus and Frank are working on the issue
-    - [ ] New chado database container to generate a complete chado db with a complete import of all orthologies
+    - [ ] New chado database container to generate a complete chado db with a complete import of all onthologies
     - [ ] Instead of default GO use GO 1.2
     - [ ] Export the created database using pg_dump
     - [ ] Get the very last chado by parsing the RSS feed
