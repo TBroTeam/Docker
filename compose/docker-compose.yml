@@ -1,0 +1,36 @@
+version: '2'
+services:
+  chado:
+    image: greatfireball/generic_postgresql_db
+    environment:
+      DB_USER: tbro
+      DB_PW: tbro
+      DB_NAME: chado
+  chado_load:
+    image: tbroteam/generic_chado_db_reload
+    links:
+      - chado:CHADO
+  worker_db:
+    image: greatfireball/generic_postgresql_db
+    environment:
+      DB_USER: tbro
+      DB_PW: tbro
+      DB_NAME: chado
+  worker_ftp:
+    image: tbroteam/tbro_worker_ftp
+    environment:
+      FTP_USER: tbro
+      FTP_PW: ftp
+  worker:
+    image: tbroteam/tbro_worker
+    links:
+      - worker_db:WORKER
+      - worker_ftp:WORKERFTP
+  tbro:
+    image: tbroteam/tbro_apache
+    links:
+      - chado:CHADO 
+      - worker_ftp:WORKERFTP 
+      - worker_db:WORKER
+    ports:
+      - "80:80"
